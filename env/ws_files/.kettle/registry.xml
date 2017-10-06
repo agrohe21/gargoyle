@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="entity-0-id">PDI_Operations_Mart&#x7e;&#x24;EMPTY&#x24;&#x7e;mondrian_mdx</entry>
+<entry key="entity-0-type">PHYS_TABLE</entry>
+<entry key="entity-0-title">mondrian_mdx</entry>
+<entry key="entity-1-id">PDI_Operations_Mart&#x7e;&#x24;EMPTY&#x24;&#x7e;mondrian_sql</entry>
+<entry key="entity-1-type">PHYS_TABLE</entry>
+<entry key="entity-1-title">mondrian_sql</entry>
+<entry key="entity-2-id">PDI_Operations_Mart&#x7e;pentaho_operations_mart&#x7e;session_file</entry>
+<entry key="entity-2-type">PHYS_TABLE</entry>
+<entry key="entity-2-title">session_file</entry>
+<entry key="entity-3-id">local-file&#x7e;&#x24;NULL&#x24;</entry>
+<entry key="entity-3-type">TRANSFORMATION</entry>
+<entry key="entity-3-title">load_combined_session_file</entry>
+<entry key="entity-4-id">user</entry>
+<entry key="entity-4-type">USER</entry>
+<entry key="entity-4-title">user</entry>
+<entry key="entity-4-attrkey-0">start plugin</entry>
+<entry key="entity-4-attrvalue-0">2</entry>
+<entry key="link-0-subId">local-file&#x7e;&#x24;NULL&#x24;</entry>
+<entry key="link-0-subType">TRANSFORMATION</entry>
+<entry key="link-0-verb">POPULATES</entry>
+<entry key="link-0-objId">PDI_Operations_Mart&#x7e;&#x24;EMPTY&#x24;&#x7e;mondrian_mdx</entry>
+<entry key="link-0-objType">PHYS_TABLE</entry>
+<entry key="link-1-subId">local-file&#x7e;&#x24;NULL&#x24;</entry>
+<entry key="link-1-subType">TRANSFORMATION</entry>
+<entry key="link-1-verb">POPULATES</entry>
+<entry key="link-1-objId">PDI_Operations_Mart&#x7e;&#x24;EMPTY&#x24;&#x7e;mondrian_sql</entry>
+<entry key="link-1-objType">PHYS_TABLE</entry>
+<entry key="link-2-subId">local-file&#x7e;&#x24;NULL&#x24;</entry>
+<entry key="link-2-subType">TRANSFORMATION</entry>
+<entry key="link-2-verb">POPULATES</entry>
+<entry key="link-2-objId">PDI_Operations_Mart&#x7e;pentaho_operations_mart&#x7e;session_file</entry>
+<entry key="link-2-objType">PHYS_TABLE</entry>
+</properties>
