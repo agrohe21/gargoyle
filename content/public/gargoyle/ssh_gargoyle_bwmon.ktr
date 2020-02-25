@@ -535,7 +535,7 @@
     <hop>
       <from>finished bucket</from>
       <to>output excel</to>
-      <enabled>Y</enabled>
+      <enabled>N</enabled>
     </hop>
     <hop>
       <from>to:bwmon</from>
@@ -1607,8 +1607,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
     <servername>${GARGOYLE_HOST}</servername>
     <userName>${GARGOYLE_USER}</userName>
     <password>${GARGOYLE_PASS}</password>
-    <usePrivateKey>N</usePrivateKey>
-    <keyFileName>C:\cygwin64\home\andgrohe\.ssh\gargoyle</keyFileName>
+    <usePrivateKey>Y</usePrivateKey>
+    <keyFileName>/home/agrohe21/.ssh/gargoyle</keyFileName>
     <passPhrase>Encrypted </passPhrase>
     <stdOutFieldName>stdOut</stdOutFieldName>
     <stdErrFieldName>stdErr</stdErrFieldName>
