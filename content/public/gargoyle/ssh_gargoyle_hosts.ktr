@@ -437,7 +437,7 @@
   <notepads>
   </notepads>
   <connection>
-    <name>gargoyle_bwmon</name>
+    <name>gargoyle_mon</name>
     <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
@@ -504,6 +504,11 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
+      <from>parsed quotas</from>
+      <to>output excel</to>
+      <enabled>N</enabled>
+    </hop>
+    <hop>
       <from>sf:show-fields</from>
       <to>parsed quotas</to>
       <enabled>Y</enabled>
@@ -528,37 +533,7 @@
       <to>iu:hosts</to>
       <enabled>Y</enabled>
     </hop>
-    <hop>
-      <from>iu:hosts</from>
-      <to>bad data</to>
-      <enabled>Y</enabled>
-    </hop>
   </order>
-  <step>
-    <name>bad data</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>780</xloc>
-      <yloc>240</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
   <step>
     <name>calc parse date fields</name>
     <type>Calculator</type>
@@ -970,8 +945,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>630</xloc>
-      <yloc>150</yloc>
+      <xloc>640</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1016,8 +991,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>270</xloc>
-      <yloc>240</yloc>
+      <xloc>272</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1047,8 +1022,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>540</xloc>
-      <yloc>150</yloc>
+      <xloc>544</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1063,7 +1038,7 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>gargoyle_bwmon</connection>
+    <connection>gargoyle_mon</connection>
     <commit>100</commit>
     <update_bypassed>N</update_bypassed>
     <lookup>
@@ -1200,8 +1175,91 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>780</xloc>
-      <yloc>150</yloc>
+      <xloc>752</xloc>
+      <yloc>128</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>output excel</name>
+    <type>ExcelOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <header>Y</header>
+    <footer>N</footer>
+    <encoding/>
+    <append>N</append>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name>${PROJECT_OUTPUT}/quota</name>
+      <extention>xls</extention>
+      <do_not_open_newfile_init>N</do_not_open_newfile_init>
+      <create_parent_folder>N</create_parent_folder>
+      <split>N</split>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>Y</SpecifyFormat>
+      <date_time_format>yyyyMMddHHmmss</date_time_format>
+      <sheetname>quota</sheetname>
+      <autosizecolums>N</autosizecolums>
+      <nullisblank>N</nullisblank>
+      <protect_sheet>N</protect_sheet>
+      <password>Encrypted </password>
+      <splitevery>0</splitevery>
+      <usetempfiles>N</usetempfiles>
+      <tempdirectory/>
+    </file>
+    <template>
+      <enabled>N</enabled>
+      <append>N</append>
+      <filename>template.xls</filename>
+    </template>
+    <fields>
+      <field>
+        <name>quota_range</name>
+        <type>String</type>
+        <format/>
+      </field>
+      <field>
+        <name>quota_pct_used</name>
+        <type>Number</type>
+        <format>#0.0000</format>
+      </field>
+    </fields>
+    <custom>
+      <header_font_name>arial</header_font_name>
+      <header_font_size>10</header_font_size>
+      <header_font_bold>N</header_font_bold>
+      <header_font_italic>N</header_font_italic>
+      <header_font_underline>no</header_font_underline>
+      <header_font_orientation>horizontal</header_font_orientation>
+      <header_font_color>black</header_font_color>
+      <header_background_color>none</header_background_color>
+      <header_row_height>255</header_row_height>
+      <header_alignment>left</header_alignment>
+      <header_image/>
+      <row_font_name>arial</row_font_name>
+      <row_font_size>10</row_font_size>
+      <row_font_color>black</row_font_color>
+      <row_background_color>none</row_background_color>
+    </custom>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>448</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1225,8 +1283,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>420</xloc>
-      <yloc>150</yloc>
+      <xloc>448</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1315,8 +1373,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>330</xloc>
-      <yloc>150</yloc>
+      <xloc>352</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1347,8 +1405,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>180</xloc>
-      <yloc>150</yloc>
+      <xloc>192</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1371,7 +1429,7 @@
     <userName>${GARGOYLE_USER}</userName>
     <password>${GARGOYLE_PASS}</password>
     <usePrivateKey>Y</usePrivateKey>
-    <keyFileName>${user.home}/.ssh/gargoyle</keyFileName>
+    <keyFileName>/home/agrohe21/.ssh/gargoyle</keyFileName>
     <passPhrase>Encrypted </passPhrase>
     <stdOutFieldName>stdOut</stdOutFieldName>
     <stdErrFieldName>stdErr</stdErrFieldName>
@@ -1389,8 +1447,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>90</xloc>
-      <yloc>150</yloc>
+      <xloc>96</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1420,24 +1478,12 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>270</xloc>
-      <yloc>150</yloc>
+      <xloc>272</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
-    <error>
-      <source_step>iu:hosts</source_step>
-      <target_step>bad data</target_step>
-      <is_enabled>Y</is_enabled>
-      <nr_valuename/>
-      <descriptions_valuename/>
-      <fields_valuename/>
-      <codes_valuename/>
-      <max_errors/>
-      <max_pct_errors/>
-      <min_pct_rows/>
-    </error>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>

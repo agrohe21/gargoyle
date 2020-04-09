@@ -884,7 +884,7 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>784</xloc>
+      <xloc>640</xloc>
       <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
@@ -893,7 +893,7 @@
     <name>gsi:data</name>
     <type>SystemInfo</type>
     <description/>
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
