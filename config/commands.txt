@@ -1,2 +1,75 @@
 print_quotas |grep quotaPercents |grep -v "\= \[\];"|grep -v " 0.000," |grep -v "var quotaPercents" |awk '/\]\[/{sub(/.*\]\[ /, "");print}' |awk '{print $1, $5}'|cut -c 2- |sed 's/.$//'|sed 's/"//'|awk '{ if($2 >= 99) { print } }'
 print_quotas |grep quotaPercents |grep -v "\= \[\];"|grep -v " 0.000," |grep -v "var quotaPercents" |awk '/\]\[/{sub(/.*\]\[ /, "");print}' |awk '{print $1, $5}'|cut -c 2- |sed 's/.$//'|sed 's/"//'
+
+select Measures.allmembers on columns
+from bw 
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE))
+
+select {Measures.dcount_session_id, Measures.sum_session_duration, Measures.sum_session_total_mbytes} on columns,
+order(filter(filter([user_dim.user_ip].ip_address.members, Measures.sum_session_total_mbytes >= 50), Measures.sum_session_duration >= 61), Measures.sum_session_duration, dESC)  on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE))
+
+select {Measures.dcount_session_id, Measures.sum_session_duration, Measures.sum_session_total_mbytes, Measures.avg_session_total_mbytes} on columns,
+order(filter(filter([user_dim.user_ip].ip_address.members, Measures.sum_session_total_mbytes >= 50), Measures.dcount_session_id > 1), Measures.avg_session_total_mbytes, dESC)  on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE))
+
+select Measures.allmembers on columns,
+order(filter([user_dim.user_ip].ip_address.members,Measures.dcount_session_id > 1), Measures.avg_session_total_mbytes, dESC)  on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE))
+
+select {Measures.cm_daily_usage_rate, sum_session_total_mbytes} on columns,
+non empty [user_dim.user_ip].andy.children on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE))
+
+select {Measures.cm_daily_usage_rate, sum_session_total_mbytes} on columns,
+{CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(5):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)} on rows
+from session
+where ([user_dim.user_ip].andy.children)
+
+select {Measures.sum_session_total_mbytes, Measures.cm_daily_rate} on columns,
+non empty [user_dim.user_ip].andy.children on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(0))
+
+with
+member Measures.total_days as count(CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]').children)
+member Measures.used_days as count(descendants(CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]'), [date_dim.ymdhms].[Day month], SELF))-1
+member Measures.remaining_days as Measures.total_days-Measures.used_days
+member Measures.remaining_usage as Measures.cm_daily_rate*Measures.remaining_days
+select non empty {Measures.sum_session_total_mbytes, Measures.remaining_usage} on columns,
+non empty [user_dim.user_ip].andy.children on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(0))
+
+with
+member Measures.cm_count_days_in_month as count(CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]').children)
+member Measures.cm_count_past_days_in_month as count(descendants(CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]'), [date_dim.ymdhms].[Day month], SELF))-1
+member Measures.cm_count_future_days_in_month as Measures.cm_count_days_in_month-Measures.cm_count_past_days_in_month
+member Measures.cm_sum_future_session_total_mybtes as Measures.cm_count_future_days_in_month*Measures.cm_avg_sum_session_total_mybytes_10_day
+member Measures.mtd_sum_session_total_mbytes as sum(mtd(CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)), Measures.sum_session_total_mbytes)
+member Measures.cm_month_sum_session_total_mbytes as Measures.mtd_sum_session_total_mbytes + Measures.cm_sum_future_session_total_mybtes
+select non empty {Measures.mtd_sum_session_total_mbytes, Measures.cm_sum_future_session_total_mybtes, Measures.cm_month_sum_session_total_mbytes} on columns,
+non empty {[user_dim.user_ip].andy,[user_dim.user_ip].megan, [user_dim.user_ip].eva, [user_dim.user_ip].jackson, [user_dim.user_ip].mckinley}on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(0))
+
+with
+set [ns_past_24_hour] as CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE).lag(24):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE)
+set [ns_family] as {[user_dim.user_ip].andy,[user_dim.user_ip].megan, [user_dim.user_ip].eva, [user_dim.user_ip].jackson, [user_dim.user_ip].mckinley}
+set [ns_family_hosts] as descendants([ns_family], [user_dim.user_ip].ip_address)
+member Measures.cm_avg_sum_session_total_mbytes_24_hour as Avg([ns_past_24_hour], Measures.sum_session_total_mbytes)
+member Measures.cm_count_hours_in_day as count(CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]').children)
+set [ns_past_hours_in_day] as CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d].[h]', BEFORE).parent.firstchild:CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d].[h]', BEFORE)
+member Measures.cm_count_past_hours_in_day as count([ns_past_hours_in_day])
+member Measures.cm_count_future_hours_in_day as Measures.cm_count_hours_in_day-Measures.cm_count_past_hours_in_day
+member Measures.cm_sum_future_session_total_mybtes as Measures.cm_count_future_hours_in_day*Measures.cm_avg_sum_session_total_mbytes_24_hour
+member Measures.htd_sum_session_total_mbytes as sum([ns_past_hours_in_day], Measures.sum_session_total_mbytes)
+member Measures.cm_day_sum_session_total_mbytes as Measures.htd_sum_session_total_mbytes + Measures.cm_sum_future_session_total_mybtes
+select non empty {Measures.cm_day_sum_session_total_mbytes, Measures.cm_avg_sum_session_total_mbytes_week} on columns,
+non empty [user_dim.user_ip].ip_address.members on rows
+from session
+where (CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE).lag(0))

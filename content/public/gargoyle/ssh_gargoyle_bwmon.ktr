@@ -437,14 +437,14 @@
   <notepads>
   </notepads>
   <connection>
-    <name>vm_ora</name>
+    <name>gargoyle_mon</name>
     <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
-    <type>ORACLE</type>
+    <type>POSTGRESQL</type>
     <access>Native</access>
     <database>${GARGOYLE_BWMON_DATABASE}</database>
-    <port>1521</port>
-    <username>pentaho</username>
-    <password>Encrypted 2be98afc86aa7f2e4bb18bd63c99dbdde</password>
+    <port>5432</port>
+    <username>${GARGOYLE_BWMON_USER}</username>
+    <password>${GARGOYLE_BWMON_PASS}</password>
     <servername/>
     <data_tablespace/>
     <index_tablespace/>
@@ -463,7 +463,7 @@
       </attribute>
       <attribute>
         <code>PORT_NUMBER</code>
-        <attribute>1521</attribute>
+        <attribute>5432</attribute>
       </attribute>
       <attribute>
         <code>PRESERVE_RESERVED_WORD_CASE</code>
@@ -474,16 +474,12 @@
         <attribute>N</attribute>
       </attribute>
       <attribute>
-        <code>STRICT_NUMBER_38_INTERPRETATION</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
         <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
-        <attribute>N</attribute>
+        <attribute>Y</attribute>
       </attribute>
       <attribute>
         <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
-        <attribute>N</attribute>
+        <attribute>Y</attribute>
       </attribute>
       <attribute>
         <code>USE_POOLING</code>
@@ -535,21 +531,16 @@
     <hop>
       <from>finished bucket</from>
       <to>output excel</to>
-      <enabled>Y</enabled>
+      <enabled>N</enabled>
     </hop>
     <hop>
       <from>to:bwmon</from>
-      <to>Dummy (do nothing)</to>
+      <to>discard</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
       <from>finished bucket</from>
       <to>calc parse date fields</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>calc parse date fields</from>
-      <to>to:bwmon</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -562,10 +553,65 @@
       <to>finished bucket</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>calc parse date fields</from>
+      <to>dbl:lookup-host-mac</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:check-new</from>
+      <to>new</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>ad:mail</from>
+      <to>Mail</to>
+      <enabled>N</enabled>
+    </hop>
+    <hop>
+      <from>new</from>
+      <to>mgb:group-unique-ip</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>mgb:group-unique-ip</from>
+      <to>ad:mail</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>select dates</from>
+      <to>invalid rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>invalid rows</from>
+      <to>wl:invalid-select_rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>new</from>
+      <to>sfc:user_name</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sfc:user_name</from>
+      <to>to:bwmon</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>dbl:lookup-host-mac</from>
+      <to>fr:check-new</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:check-new</from>
+      <to>to:bwmon</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
   <step>
-    <name>Dummy (do nothing)</name>
-    <type>Dummy</type>
+    <name>Mail</name>
+    <type>Mail</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -574,6 +620,48 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <server>smtp-server</server>
+    <port>smtp-port</port>
+    <destination>dest-addr</destination>
+    <destinationCc/>
+    <destinationBCc/>
+    <replyToAddresses/>
+    <replyto>send-addr</replyto>
+    <replytoname>sender-name</replytoname>
+    <subject>mail-subject</subject>
+    <include_date>Y</include_date>
+    <include_subfolders>N</include_subfolders>
+    <zipFilenameDynamic>N</zipFilenameDynamic>
+    <isFilenameDynamic>N</isFilenameDynamic>
+    <attachContentFromField>N</attachContentFromField>
+    <attachContentField/>
+    <attachContentFileNameField/>
+    <dynamicFieldname/>
+    <dynamicWildcard/>
+    <dynamicZipFilename/>
+    <sourcefilefoldername/>
+    <sourcewildcard/>
+    <contact_person/>
+    <contact_phone/>
+    <comment>ip_addr</comment>
+    <include_files>N</include_files>
+    <zip_files>N</zip_files>
+    <zip_name/>
+    <zip_limit_size>0</zip_limit_size>
+    <use_auth>Y</use_auth>
+    <use_secure_auth>Y</use_secure_auth>
+    <auth_user>auth-user</auth_user>
+    <auth_password>Encrypted 2be98afc86aa7f285be0da63dce93bcc9</auth_password>
+    <only_comment>N</only_comment>
+    <use_HTML>N</use_HTML>
+    <use_Priority>Y</use_Priority>
+    <encoding>UTF-8</encoding>
+    <priority>normal</priority>
+    <importance>high</importance>
+    <sensitivity>normal</sensitivity>
+    <secureconnectiontype>TLS</secureconnectiontype>
+    <embeddedimages>
+      </embeddedimages>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -583,8 +671,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1424</xloc>
-      <yloc>304</yloc>
+      <xloc>1168</xloc>
+      <yloc>544</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -614,8 +702,131 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>320</xloc>
-      <yloc>192</yloc>
+      <xloc>288</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ad:mail</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>dest-addr</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>agrohe21@yahoo.com</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>sender-name</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>Andy Grohe</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>send-addr</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>agrohe21@gmail.com</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>smtp-server</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>smtp.gmail.com</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>smtp-port</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>587</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>auth-user</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>agrohe21@gmail.com</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>auth-pass</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>jggvouilhzvauqoz</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>mail-subject</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>New User Detected</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1168</xloc>
+      <yloc>464</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1030,8 +1241,68 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1296</xloc>
-      <yloc>192</yloc>
+      <xloc>912</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>dbl:lookup-host-mac</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>gargoyle_mon</connection>
+    <cache>Y</cache>
+    <cache_load_all>Y</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>GARGOYLE_HOSTS</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>ip_addr</name>
+        <field>host_ip</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>host_mac</name>
+        <rename>host_mac</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>host_name</name>
+        <rename>host_name</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>user_name</name>
+        <rename>user_name</rename>
+        <default/>
+        <type>String</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1056</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1055,8 +1326,33 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>880</xloc>
-      <yloc>192</yloc>
+      <xloc>608</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>discard</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1376</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1135,8 +1431,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>800</xloc>
-      <yloc>192</yloc>
+      <xloc>528</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1160,8 +1456,43 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1184</xloc>
-      <yloc>192</yloc>
+      <xloc>800</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>fr:check-new</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>new</send_true_to>
+    <send_false_to>to:bwmon</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>user_name</leftvalue>
+        <function>IS NULL</function>
+        <rightvalue/>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1168</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1185,8 +1516,33 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>800</xloc>
-      <yloc>272</yloc>
+      <xloc>528</xloc>
+      <yloc>288</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>invalid rows</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>688</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1247,8 +1603,78 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>640</xloc>
-      <yloc>192</yloc>
+      <xloc>368</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>mgb:group-unique-ip</name>
+    <type>MemoryGroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <give_back_row>N</give_back_row>
+    <group>
+      <field>
+        <name>ip_addr</name>
+      </field>
+    </group>
+    <fields>
+      <field>
+        <aggregate>total_bytes</aggregate>
+        <subject>bytes</subject>
+        <type>SUM</type>
+        <valuefield/>
+      </field>
+      <field>
+        <aggregate>dates</aggregate>
+        <subject>start_date</subject>
+        <type>CONCAT_COMMA</type>
+        <valuefield/>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1168</xloc>
+      <yloc>400</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>new</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1168</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1340,8 +1766,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1184</xloc>
-      <yloc>272</yloc>
+      <xloc>800</xloc>
+      <yloc>288</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1380,8 +1806,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>720</xloc>
-      <yloc>192</yloc>
+      <xloc>448</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1389,7 +1815,7 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
     <name>select dates</name>
     <type>SelectValues</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -1438,8 +1864,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
         <type>Timestamp</type>
         <length>-2</length>
         <precision>-2</precision>
-        <conversion_mask>EE MMM dd kk:mm:ss yyyy</conversion_mask>
-        <date_format_lenient>false</date_format_lenient>
+        <conversion_mask>E MMM dd kk:mm:ss yyyy</conversion_mask>
+        <date_format_lenient>true</date_format_lenient>
         <date_format_locale/>
         <date_format_timezone/>
         <lenient_string_to_number>false</lenient_string_to_number>
@@ -1447,7 +1873,7 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
         <decimal_symbol/>
         <grouping_symbol/>
         <currency_symbol/>
-        <storage_type/>
+        <storage_type>normal</storage_type>
       </meta>
       <meta>
         <name>end_date</name>
@@ -1455,8 +1881,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
         <type>Timestamp</type>
         <length>-2</length>
         <precision>-2</precision>
-        <conversion_mask>EE MMM dd kk:mm:ss yyyy</conversion_mask>
-        <date_format_lenient>false</date_format_lenient>
+        <conversion_mask>E MMM dd kk:mm:ss yyyy</conversion_mask>
+        <date_format_lenient>true</date_format_lenient>
         <date_format_locale/>
         <date_format_timezone/>
         <lenient_string_to_number>false</lenient_string_to_number>
@@ -1464,7 +1890,7 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
         <decimal_symbol/>
         <grouping_symbol/>
         <currency_symbol/>
-        <storage_type/>
+        <storage_type>normal</storage_type>
       </meta>
     </fields>
     <attributes/>
@@ -1476,8 +1902,42 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>960</xloc>
-      <yloc>192</yloc>
+      <xloc>688</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sfc:user_name</name>
+    <type>SetValueConstant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <usevar>N</usevar>
+    <fields>
+      <field>
+        <name>user_name</name>
+        <value>Unknown</value>
+        <mask/>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1264</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1551,8 +2011,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>240</xloc>
-      <yloc>192</yloc>
+      <xloc>208</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1583,8 +2043,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>160</xloc>
-      <yloc>192</yloc>
+      <xloc>128</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1607,12 +2067,12 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
     <servername>${GARGOYLE_HOST}</servername>
     <userName>${GARGOYLE_USER}</userName>
     <password>${GARGOYLE_PASS}</password>
-    <usePrivateKey>N</usePrivateKey>
-    <keyFileName>C:\cygwin64\home\andgrohe\.ssh\gargoyle</keyFileName>
+    <usePrivateKey>Y</usePrivateKey>
+    <keyFileName>${user.home}/.ssh/gargoyle</keyFileName>
     <passPhrase>Encrypted </passPhrase>
     <stdOutFieldName>stdOut</stdOutFieldName>
     <stdErrFieldName>stdErr</stdErrFieldName>
-    <timeOut>0</timeOut>
+    <timeOut>20</timeOut>
     <proxyHost/>
     <proxyPort/>
     <proxyUsername/>
@@ -1626,8 +2086,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>80</xloc>
-      <yloc>192</yloc>
+      <xloc>48</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -1642,8 +2102,8 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>vm_ora</connection>
-    <schema>PENTAHO</schema>
+    <connection>gargoyle_mon</connection>
+    <schema/>
     <table>GARGOYLE_BWMON</table>
     <commit>10000</commit>
     <truncate>N</truncate>
@@ -1670,15 +2130,71 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1424</xloc>
-      <yloc>192</yloc>
+      <xloc>1264</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>wl:invalid-select_rows</name>
+    <type>WriteToLog</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <loglevel>log_level_basic</loglevel>
+    <displayHeader>Y</displayHeader>
+    <limitRows>Y</limitRows>
+    <limitRowsNumber>50</limitRowsNumber>
+    <logmessage>Invalid rows found</logmessage>
+    <fields>
+      <field>
+        <name>ip_addr</name>
+      </field>
+      <field>
+        <name>bytes</name>
+      </field>
+      <field>
+        <name>start_date</name>
+      </field>
+      <field>
+        <name>end_date</name>
+      </field>
+      <field>
+        <name>err_nbr</name>
+      </field>
+      <field>
+        <name>err_desc</name>
+      </field>
+      <field>
+        <name>err_fld</name>
+      </field>
+      <field>
+        <name>err_cd</name>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>688</xloc>
+      <yloc>400</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
     <error>
       <source_step>select dates</source_step>
-      <target_step/>
+      <target_step>invalid rows</target_step>
       <is_enabled>Y</is_enabled>
       <nr_valuename>err_nbr</nr_valuename>
       <descriptions_valuename>err_desc</descriptions_valuename>
@@ -1690,7 +2206,7 @@ var ip_addr = '', tmp, dl_cmd =getVariable("GARGOYLE_BWMON_DOWNLOAD", "bdist1-do
     </error>
     <error>
       <source_step>to:bwmon</source_step>
-      <target_step>Dummy (do nothing)</target_step>
+      <target_step>discard</target_step>
       <is_enabled>Y</is_enabled>
       <nr_valuename/>
       <descriptions_valuename/>
