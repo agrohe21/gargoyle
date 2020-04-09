@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ssh_gargoyle_webmon</name>
+    <name>ssh_gargoyle_hosts</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -437,7 +437,7 @@
   <notepads>
   </notepads>
   <connection>
-    <name>gargoyle_mon</name>
+    <name>gargoyle_bwmon</name>
     <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
@@ -489,59 +489,54 @@
   </connection>
   <order>
     <hop>
-      <from>ssh get web domains</from>
-      <to>splt rows</to>
+      <from>ssh get quotas</from>
+      <to>sr:parse-stdOut</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>splt rows</from>
-      <to>split fields</to>
+      <from>sr:parse-stdOut</from>
+      <to>sv:text</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>js get ip_addr</from>
-      <to>select</to>
+      <from>sv:text</from>
+      <to>sf:show-fields</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>split fields</from>
-      <to>js get ip_addr</to>
+      <from>sf:show-fields</from>
+      <to>parsed quotas</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>select</from>
-      <to>Memory group by</to>
+      <from>parsed quotas</from>
+      <to>gsi:data</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Memory group by</from>
-      <to>Sort rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>select</from>
+      <from>gsi:data</from>
       <to>calc parse date fields</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>calc parse date fields</from>
-      <to>to:webmon</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>to:webmon</from>
-      <to>existing records</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>select</from>
-      <to>oe:webmon</to>
+      <from>dg:test-data</from>
+      <to>sf:show-fields</to>
       <enabled>N</enabled>
+    </hop>
+    <hop>
+      <from>calc parse date fields</from>
+      <to>iu:hosts</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>iu:hosts</from>
+      <to>bad data</to>
+      <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Memory group by</name>
-    <type>MemoryGroupBy</type>
+    <name>bad data</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -550,20 +545,6 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <give_back_row>N</give_back_row>
-    <group>
-      <field>
-        <name>ip</name>
-      </field>
-    </group>
-    <fields>
-      <field>
-        <aggregate>hits</aggregate>
-        <subject>domain</subject>
-        <type>COUNT_ALL</type>
-        <valuefield/>
-      </field>
-    </fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -573,50 +554,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>480</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Sort rows</name>
-    <type>SortRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
-    <fields>
-      <field>
-        <name>hits</name>
-        <ascending>N</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>592</xloc>
-      <yloc>96</yloc>
+      <xloc>780</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -635,7 +574,7 @@
     <calculation>
       <field_name>YEAR</field_name>
       <calc_type>YEAR_OF_DATE</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>Integer</value_type>
@@ -650,7 +589,7 @@
     <calculation>
       <field_name>MONTH_YEAR</field_name>
       <calc_type>MONTH_OF_DATE</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>Integer</value_type>
@@ -665,7 +604,7 @@
     <calculation>
       <field_name>DAY_MONTH</field_name>
       <calc_type>DAY_OF_MONTH</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>Integer</value_type>
@@ -680,7 +619,7 @@
     <calculation>
       <field_name>DAY_YEAR</field_name>
       <calc_type>DAY_OF_YEAR</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>Integer</value_type>
@@ -695,7 +634,7 @@
     <calculation>
       <field_name>DAY_WEEK</field_name>
       <calc_type>DAY_OF_WEEK</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>Integer</value_type>
@@ -710,7 +649,7 @@
     <calculation>
       <field_name>WEEK_YEAR</field_name>
       <calc_type>WEEK_OF_YEAR</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>Integer</value_type>
@@ -770,7 +709,7 @@
     <calculation>
       <field_name>HOUR_DAY</field_name>
       <calc_type>HOUR_OF_DAY</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>None</value_type>
@@ -785,7 +724,7 @@
     <calculation>
       <field_name>MINUTE_HOUR</field_name>
       <calc_type>MINUTE_OF_HOUR</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>None</value_type>
@@ -800,7 +739,7 @@
     <calculation>
       <field_name>SECOND_MINUTE</field_name>
       <calc_type>SECOND_OF_MINUTE</calc_type>
-      <field_a>trans_date</field_a>
+      <field_a>sys_date</field_a>
       <field_b/>
       <field_c/>
       <value_type>None</value_type>
@@ -971,7 +910,7 @@
       <value_type>Integer</value_type>
       <value_length>-1</value_length>
       <value_precision>-1</value_precision>
-      <remove>N</remove>
+      <remove>Y</remove>
       <conversion_mask/>
       <decimal_symbol/>
       <grouping_symbol/>
@@ -1031,14 +970,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>576</xloc>
-      <yloc>192</yloc>
+      <xloc>630</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>existing records</name>
-    <type>Dummy</type>
+    <name>dg:test-data</name>
+    <type>DataGrid</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1047,61 +986,27 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>672</xloc>
-      <yloc>288</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>js get ip_addr</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-
-
-trans_date =  new Date(0);
-trans_date.setUTCSeconds(date_epoch);</jsScript_script>
-      </jsScript>
-      <jsScript>
-        <jsScript_type>1</jsScript_type>
-        <jsScript_name>start</jsScript_name>
-        <jsScript_script>//Script here
-
-var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
-      </jsScript>
-    </jsScripts>
     <fields>
       <field>
-        <name>trans_date</name>
-        <rename>trans_date</rename>
-        <type>Date</type>
-        <length>-1</length>
+        <name>text</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>126</length>
         <precision>-1</precision>
-        <replace>N</replace>
+        <set_empty_string>N</set_empty_string>
       </field>
     </fields>
+    <data>
+      <line>
+        <item>1582756698 2c:0e:3d:9e:34:94 10.0.0.31 andy-S7</item>
+      </line>
+      <line>
+        <item>1582757775 a4:da:22:31:be:04 10.0.0.223 *</item>
+      </line>
+    </data>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1111,102 +1016,14 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>384</xloc>
-      <yloc>192</yloc>
+      <xloc>270</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>oe:webmon</name>
-    <type>ExcelOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <header>Y</header>
-    <footer>N</footer>
-    <encoding/>
-    <append>N</append>
-    <add_to_result_filenames>Y</add_to_result_filenames>
-    <file>
-      <name>${PROJECT_OUTPUT}/webmon</name>
-      <extention>xls</extention>
-      <do_not_open_newfile_init>N</do_not_open_newfile_init>
-      <create_parent_folder>N</create_parent_folder>
-      <split>N</split>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <SpecifyFormat>Y</SpecifyFormat>
-      <date_time_format>yyyyMMddHHmmss</date_time_format>
-      <sheetname>webmon</sheetname>
-      <autosizecolums>N</autosizecolums>
-      <nullisblank>N</nullisblank>
-      <protect_sheet>N</protect_sheet>
-      <password>Encrypted </password>
-      <splitevery>0</splitevery>
-      <usetempfiles>N</usetempfiles>
-      <tempdirectory/>
-    </file>
-    <template>
-      <enabled>N</enabled>
-      <append>N</append>
-      <filename>template.xls</filename>
-    </template>
-    <fields>
-      <field>
-        <name>ip</name>
-        <type>String</type>
-        <format/>
-      </field>
-      <field>
-        <name>trans_date</name>
-        <type>Date</type>
-        <format/>
-      </field>
-      <field>
-        <name>domain</name>
-        <type>String</type>
-        <format/>
-      </field>
-    </fields>
-    <custom>
-      <header_font_name>arial</header_font_name>
-      <header_font_size>10</header_font_size>
-      <header_font_bold>N</header_font_bold>
-      <header_font_italic>N</header_font_italic>
-      <header_font_underline>no</header_font_underline>
-      <header_font_orientation>horizontal</header_font_orientation>
-      <header_font_color>black</header_font_color>
-      <header_background_color>none</header_background_color>
-      <header_row_height>255</header_row_height>
-      <header_alignment>left</header_alignment>
-      <header_image/>
-      <row_font_name>arial</row_font_name>
-      <row_font_size>10</row_font_size>
-      <row_font_color>black</row_font_color>
-      <row_background_color>none</row_background_color>
-    </custom>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>480</xloc>
-      <yloc>288</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>select</name>
-    <type>SelectValues</type>
+    <name>gsi:data</name>
+    <type>SystemInfo</type>
     <description/>
     <distribute>N</distribute>
     <custom_distribution/>
@@ -1217,15 +1034,9 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
     </partitioning>
     <fields>
       <field>
-        <name>ip</name>
+        <name>sys_date</name>
+        <type>system date (fixed)</type>
       </field>
-      <field>
-        <name>trans_date</name>
-      </field>
-      <field>
-        <name>domain</name>
-      </field>
-      <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1236,13 +1047,191 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>480</xloc>
-      <yloc>192</yloc>
+      <xloc>540</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>split fields</name>
+    <name>iu:hosts</name>
+    <type>InsertUpdate</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>gargoyle_bwmon</connection>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema/>
+      <table>GARGOYLE_HOSTS</table>
+      <key>
+        <name>host_mac</name>
+        <field>host_mac</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>host_mac</name>
+        <rename>host_mac</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>host_ip</name>
+        <rename>host_ip</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>host_name</name>
+        <rename>host_name</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>sys_date</name>
+        <rename>sys_date</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>YEAR</name>
+        <rename>YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MONTH_YEAR</name>
+        <rename>MONTH_YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>DAY_MONTH</name>
+        <rename>DAY_MONTH</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>DAY_YEAR</name>
+        <rename>DAY_YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>DAY_WEEK</name>
+        <rename>DAY_WEEK</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>WEEK_YEAR</name>
+        <rename>WEEK_YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HOUR_DAY</name>
+        <rename>HOUR_DAY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MINUTE_HOUR</name>
+        <rename>MINUTE_HOUR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SECOND_MINUTE</name>
+        <rename>SECOND_MINUTE</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HOUR_YEAR</name>
+        <rename>HOUR_YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MINUTE_YEAR</name>
+        <rename>MINUTE_YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SECOND_YEAR</name>
+        <rename>SECOND_YEAR</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>WEEK_ALLTIME</name>
+        <rename>WEEK_ALLTIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MONTH_ALLTIME</name>
+        <rename>MONTH_ALLTIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>DAY_ALLTIME</name>
+        <rename>DAY_ALLTIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>HOUR_ALLTIME</name>
+        <rename>HOUR_ALLTIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SECOND_ALLTIME</name>
+        <rename>SECOND_ALLTIME</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>MINUTE_DAY</name>
+        <rename>MINUTE_DAY</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>SECOND_DAY</name>
+        <rename>SECOND_DAY</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>780</xloc>
+      <yloc>150</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>parsed quotas</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>420</xloc>
+      <yloc>150</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sf:show-fields</name>
     <type>FieldSplitter</type>
     <description/>
     <distribute>Y</distribute>
@@ -1253,26 +1242,41 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       <schema_name/>
     </partitioning>
     <splitfield>text</splitfield>
-    <delimiter>$[09]</delimiter>
+    <delimiter> </delimiter>
     <enclosure/>
     <fields>
       <field>
-        <name>date_epoch</name>
+        <name>timestamp</name>
         <id/>
         <idrem>N</idrem>
-        <type>Integer</type>
+        <type>String</type>
         <format/>
         <group/>
         <decimal/>
         <currency/>
-        <length>-1</length>
+        <length>12</length>
         <precision>-1</precision>
         <nullif/>
         <ifnull/>
-        <trimtype>right</trimtype>
+        <trimtype>both</trimtype>
       </field>
       <field>
-        <name>ip</name>
+        <name>host_mac</name>
+        <id/>
+        <idrem>N</idrem>
+        <type>String</type>
+        <format/>
+        <group/>
+        <decimal/>
+        <currency/>
+        <length>17</length>
+        <precision>-1</precision>
+        <nullif/>
+        <ifnull/>
+        <trimtype>both</trimtype>
+      </field>
+      <field>
+        <name>host_ip</name>
         <id/>
         <idrem>N</idrem>
         <type>String</type>
@@ -1284,10 +1288,10 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
         <precision>-1</precision>
         <nullif/>
         <ifnull/>
-        <trimtype>left</trimtype>
+        <trimtype>none</trimtype>
       </field>
       <field>
-        <name>domain</name>
+        <name>host_name</name>
         <id/>
         <idrem>N</idrem>
         <type>String</type>
@@ -1295,11 +1299,11 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
         <group/>
         <decimal/>
         <currency/>
-        <length>256</length>
+        <length>64</length>
         <precision>-1</precision>
         <nullif/>
         <ifnull/>
-        <trimtype>left</trimtype>
+        <trimtype>none</trimtype>
       </field>
     </fields>
     <attributes/>
@@ -1311,13 +1315,13 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>272</xloc>
-      <yloc>192</yloc>
+      <xloc>330</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>splt rows</name>
+    <name>sr:parse-stdOut</name>
     <type>SplitFieldToRows3</type>
     <description/>
     <distribute>Y</distribute>
@@ -1343,13 +1347,13 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>176</xloc>
-      <yloc>192</yloc>
+      <xloc>180</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>ssh get web domains</name>
+    <name>ssh get quotas</name>
     <type>SSH</type>
     <description/>
     <distribute>Y</distribute>
@@ -1360,14 +1364,14 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       <schema_name/>
     </partitioning>
     <dynamicCommandField>N</dynamicCommandField>
-    <command>cat /proc/webmon_recent_domains</command>
+    <command>/root/scripts/run_get_hosts.sh</command>
     <commandfieldname/>
     <port>${GARGOYLE_PORT}</port>
     <servername>${GARGOYLE_HOST}</servername>
     <userName>${GARGOYLE_USER}</userName>
     <password>${GARGOYLE_PASS}</password>
     <usePrivateKey>Y</usePrivateKey>
-    <keyFileName>/home/agrohe21/.ssh/gargoyle</keyFileName>
+    <keyFileName>${user.home}/.ssh/gargoyle</keyFileName>
     <passPhrase>Encrypted </passPhrase>
     <stdOutFieldName>stdOut</stdOutFieldName>
     <stdErrFieldName>stdErr</stdErrFieldName>
@@ -1385,14 +1389,14 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>192</yloc>
+      <xloc>90</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>to:webmon</name>
-    <type>TableOutput</type>
+    <name>sv:text</name>
+    <type>SelectValues</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1401,24 +1405,11 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>gargoyle_mon</connection>
-    <schema/>
-    <table>GARGOYLE_WEBMON</table>
-    <commit>10000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>N</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
     <fields>
+      <field>
+        <name>text</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1429,15 +1420,15 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>672</xloc>
-      <yloc>192</yloc>
+      <xloc>270</xloc>
+      <yloc>150</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
     <error>
-      <source_step>to:webmon</source_step>
-      <target_step>existing records</target_step>
+      <source_step>iu:hosts</source_step>
+      <target_step>bad data</target_step>
       <is_enabled>Y</is_enabled>
       <nr_valuename/>
       <descriptions_valuename/>

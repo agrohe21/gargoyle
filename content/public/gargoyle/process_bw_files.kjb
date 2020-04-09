@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>run_bwmon_gather</name>
+  <name>process_bw_files</name>
   <description/>
   <extended_description/>
   <job_version/>
+  <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
-  <created_date>2020/02/18 13:47:30.839</created_date>
+  <created_date>2020/03/16 16:24:22.671</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2020/02/18 13:47:30.839</modified_date>
+  <modified_date>2020/03/16 16:24:22.671</modified_date>
   <parameters>
-    </parameters>
+    <parameter>
+      <name>file_date</name>
+      <default_value>2020-03-16-23-24-59</default_value>
+      <description/>
+    </parameter>
+  </parameters>
   <slaveservers>
     </slaveservers>
   <job-log-table>
@@ -304,88 +310,77 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>64</xloc>
-      <yloc>64</yloc>
+      <xloc>60</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>ktr-gargoyle_bwmon</name>
+      <name>cf:processing</name>
       <description/>
-      <type>TRANS</type>
+      <type>COPY_FILES</type>
       <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_bwmon.ktr</filename>
-      <transname/>
+      <copy_empty_folders>N</copy_empty_folders>
       <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>sv:project-properties</name>
-      <description/>
-      <type>SET_VARIABLES</type>
-      <attributes/>
-      <replacevars>Y</replacevars>
-      <filename>${PROJECT_DIR}/${PROJECT_NAME}/config/${PROJECT_NAME}.properties</filename>
-      <file_variable_type>JVM</file_variable_type>
+      <overwrite_files>Y</overwrite_files>
+      <include_subfolders>N</include_subfolders>
+      <remove_source_files>Y</remove_source_files>
+      <add_result_filesname>Y</add_result_filesname>
+      <destination_is_a_file>N</destination_is_a_file>
+      <create_destination_folder>N</create_destination_folder>
       <fields>
+        <field>
+          <source_filefolder>EMPTY_SOURCE_URL-0-${PROJECT_INPUT}/gargoyle_nfs</source_filefolder>
+          <source_configuration_name>LOCAL-SOURCE-FILE-0</source_configuration_name>
+          <destination_filefolder>EMPTY_DEST_URL-0-${PROJECT_INPUT}/processing</destination_filefolder>
+          <destination_configuration_name>LOCAL-DEST-FILE-0</destination_configuration_name>
+          <wildcard>bw-.*${file_date}</wildcard>
+        </field>
       </fields>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>256</xloc>
-      <yloc>64</yloc>
+      <xloc>330</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>Write to log</name>
+      <name>efm:files-not-processed</name>
       <description/>
-      <type>WRITE_TO_LOG</type>
+      <type>EVAL_FILES_METRICS</type>
       <attributes/>
-      <logmessage/>
-      <loglevel>Detailed</loglevel>
-      <logsubject>Running: ${Internal.Job.Name}</logsubject>
+      <result_filenames_wildcard/>
+      <Result_field_file/>
+      <Result_field_wildcard/>
+      <Result_field_includesubfolders/>
+      <fields>
+        <field>
+          <source_filefolder>${PROJECT_INPUT}/gargoyle_nfs</source_filefolder>
+          <wildcard>bw-.*${file_date}</wildcard>
+          <include_subFolders>N</include_subFolders>
+        </field>
+      </fields>
+      <comparevalue>2</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successnumbercondition>equal</successnumbercondition>
+      <source_files>files</source_files>
+      <evaluation_type>count</evaluation_type>
+      <scale>bytes</scale>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>144</xloc>
-      <yloc>64</yloc>
+      <xloc>180</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>ktr-gargoyle_webmon</name>
+      <name>t:bandwidth</name>
       <description/>
       <type>TRANS</type>
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_webmon.ktr</filename>
+      <filename>${PROJECT_CONTENT}/public/gargoyle/fact_bandwidth.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -405,120 +400,97 @@
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
+      <run_configuration/>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>file_date</name>
+          <stream_name/>
+          <value>${file_date}</value>
+        </parameter>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>64</yloc>
+      <xloc>660</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>ktr-gargoyle_quota</name>
+      <name>zf:complete</name>
       <description/>
-      <type>TRANS</type>
+      <type>ZIP_FILE</type>
       <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_quota.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
+      <zipfilename>${PROJECT_INPUT}/complete/mon_bw-${file_date}.zip</zipfilename>
+      <compressionrate>1</compressionrate>
+      <ifzipfileexists>2</ifzipfileexists>
+      <wildcard>bw-.*${file_date}</wildcard>
+      <wildcardexclude/>
+      <sourcedirectory>${PROJECT_INPUT}/processing</sourcedirectory>
+      <movetodirectory/>
+      <afterzip>1</afterzip>
+      <addfiletoresult>Y</addfiletoresult>
+      <isfromprevious>N</isfromprevious>
+      <createparentfolder>N</createparentfolder>
+      <adddate>N</adddate>
+      <addtime>N</addtime>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format>yyyy-MM-dd-HH-mm-ss</date_time_format>
+      <createMoveToDirectory>N</createMoveToDirectory>
+      <include_subfolders>N</include_subfolders>
+      <stored_source_path_depth>1</stored_source_path_depth>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>688</xloc>
-      <yloc>64</yloc>
+      <xloc>750</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>ktr-gargoyle_hosts</name>
+      <name>efm:files-in-process</name>
       <description/>
-      <type>TRANS</type>
+      <type>EVAL_FILES_METRICS</type>
       <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_hosts.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
+      <result_filenames_wildcard/>
+      <Result_field_file/>
+      <Result_field_wildcard/>
+      <Result_field_includesubfolders/>
+      <fields>
+        <field>
+          <source_filefolder>${PROJECT_INPUT}/processing</source_filefolder>
+          <wildcard>bw-.*${file_date}</wildcard>
+          <include_subFolders>N</include_subFolders>
+        </field>
+      </fields>
+      <comparevalue>2</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successnumbercondition>equal</successnumbercondition>
+      <source_files>files</source_files>
+      <evaluation_type>count</evaluation_type>
+      <scale>bytes</scale>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>832</xloc>
-      <yloc>64</yloc>
+      <xloc>450</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>abort_bwmon</name>
+      <name>Abort job host processing</name>
       <description/>
       <type>ABORT</type>
       <attributes/>
-      <message/>
+      <message>Files not in processing folder:${file_date}</message>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>384</yloc>
+      <xloc>450</xloc>
+      <yloc>270</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>Success</name>
-      <description/>
-      <type>SUCCESS</type>
-      <attributes/>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>944</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>Dummy</name>
+      <name>processing</name>
       <description/>
       <type>SPECIAL</type>
       <attributes/>
@@ -535,64 +507,70 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>208</yloc>
+      <xloc>570</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>Mail</name>
+      <name>Abort job host input</name>
       <description/>
-      <type>MAIL</type>
+      <type>ABORT</type>
       <attributes/>
-      <server>smtp.gmail.com</server>
-      <port>587</port>
-      <destination>agrohe21@yahoo.com</destination>
-      <destinationCc/>
-      <destinationBCc/>
-      <replyto>agrohe21@gmail.com</replyto>
-      <replytoname>Gargoyle</replytoname>
-      <subject>Gargloy bwmon Failed</subject>
-      <include_date>Y</include_date>
-      <contact_person/>
-      <contact_phone/>
-      <comment>${GARGOYLE_BWMON_DATABASE}
-${GARGOYLE_BWMON_DATA_SERVER}
-${GARGOYLE_BWMON_DOWNLOAD}
-${GARGOYLE_BWMON_UPLOAD}
-${GARGOYLE_BWMON_USER}
-${GARGOYLE_HOST}
-${GARGOYLE_USER}</comment>
-      <include_files>N</include_files>
-      <zip_files>N</zip_files>
-      <zip_name/>
-      <use_auth>Y</use_auth>
-      <use_secure_auth>Y</use_secure_auth>
-      <auth_user>agrohe21@gmail.com</auth_user>
-      <auth_password>Encrypted 2d4ffc8be05d29b88a303b871cb83a0c0</auth_password>
-      <only_comment>Y</only_comment>
-      <use_HTML>N</use_HTML>
-      <use_Priority>N</use_Priority>
-      <encoding>UTF-8</encoding>
-      <priority>normal</priority>
-      <importance>normal</importance>
-      <sensitivity>normal</sensitivity>
-      <secureconnectiontype>TLS</secureconnectiontype>
-      <replyToAddresses/>
-      <filetypes>      </filetypes>
-      <embeddedimages>
-      </embeddedimages>
+      <message>No host files in input folder:${file_date}</message>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>304</yloc>
+      <xloc>180</xloc>
+      <yloc>270</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>efm:files-not-in-process</name>
+      <description/>
+      <type>EVAL_FILES_METRICS</type>
+      <attributes/>
+      <result_filenames_wildcard/>
+      <Result_field_file/>
+      <Result_field_wildcard/>
+      <Result_field_includesubfolders/>
+      <fields>
+        <field>
+          <source_filefolder>${PROJECT_INPUT}/processing</source_filefolder>
+          <wildcard>bw-.*${file_date}</wildcard>
+          <include_subFolders>N</include_subFolders>
+        </field>
+      </fields>
+      <comparevalue>0</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successnumbercondition>equal</successnumbercondition>
+      <source_files>files</source_files>
+      <evaluation_type>count</evaluation_type>
+      <scale>bytes</scale>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>870</xloc>
+      <yloc>150</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Success</name>
+      <description/>
+      <type>SUCCESS</type>
+      <attributes/>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>870</xloc>
+      <yloc>30</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
   <hops>
     <hop>
-      <from>sv:project-properties</from>
-      <to>ktr-gargoyle_bwmon</to>
+      <from>efm:files-not-processed</from>
+      <to>cf:processing</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -601,7 +579,7 @@ ${GARGOYLE_USER}</comment>
     </hop>
     <hop>
       <from>Start</from>
-      <to>Write to log</to>
+      <to>efm:files-not-processed</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -609,8 +587,8 @@ ${GARGOYLE_USER}</comment>
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>Write to log</from>
-      <to>sv:project-properties</to>
+      <from>t:bandwidth</from>
+      <to>zf:complete</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -618,8 +596,8 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_bwmon</from>
-      <to>ktr-gargoyle_webmon</to>
+      <from>cf:processing</from>
+      <to>efm:files-in-process</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -627,8 +605,17 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_webmon</from>
-      <to>ktr-gargoyle_quota</to>
+      <from>efm:files-in-process</from>
+      <to>Abort job host processing</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>N</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>efm:files-in-process</from>
+      <to>processing</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -636,8 +623,26 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_quota</from>
-      <to>ktr-gargoyle_hosts</to>
+      <from>processing</from>
+      <to>t:bandwidth</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>efm:files-not-processed</from>
+      <to>Abort job host input</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>N</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>zf:complete</from>
+      <to>efm:files-not-in-process</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -645,7 +650,7 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_hosts</from>
+      <from>efm:files-not-in-process</from>
       <to>Success</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -654,81 +659,16 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_webmon</from>
-      <to>Dummy</to>
+      <from>efm:files-not-processed</from>
+      <to>Success</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
       <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ktr-gargoyle_bwmon</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>sv:project-properties</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ktr-gargoyle_quota</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ktr-gargoyle_hosts</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Dummy</from>
-      <to>Mail</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>Mail</from>
-      <to>abort_bwmon</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>Y</unconditional>
     </hop>
   </hops>
   <notepads>
   </notepads>
-  <attributes>
-    <group>
-      <name>METASTORE.pentaho</name>
-      <attribute>
-        <key>Default Run Configuration</key>
-        <value>{"namespace":"pentaho","id":"Default Run Configuration","name":"Default Run Configuration","description":"Defines a default run configuration","metaStoreName":null}</value>
-      </attribute>
-    </group>
-    <group>
-      <name>{"_":"Embedded MetaStore Elements","namespace":"pentaho","type":"Default Run Configuration"}</name>
-    </group>
-  </attributes>
+  <attributes/>
 </job>

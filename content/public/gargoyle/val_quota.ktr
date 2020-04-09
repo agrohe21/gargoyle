@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ssh_gargoyle_quota</name>
+    <name>val_quota</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -9,6 +9,16 @@
     <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
+      <parameter>
+        <name>file_date</name>
+        <default_value>2020-03-20-11-04-13</default_value>
+        <description/>
+      </parameter>
+      <parameter>
+        <name>quota_limit</name>
+        <default_value>99</default_value>
+        <description/>
+      </parameter>
     </parameters>
     <log>
       <trans-log-table>
@@ -428,16 +438,16 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2017/09/11 15:21:24.884</created_date>
+    <created_date>2020/03/17 22:28:26.958</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2017/09/11 15:21:24.884</modified_date>
+    <modified_date>2020/03/17 22:28:26.958</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
   <connection>
-    <name>gargoyle_mon</name>
+    <name>gargoyle_bwmon</name>
     <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
@@ -489,74 +499,74 @@
   </connection>
   <order>
     <hop>
-      <from>ssh get quotas</from>
-      <to>sr:parse-stdOut</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>sr:parse-stdOut</from>
-      <to>sv:text</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>sv:text</from>
-      <to>sf:show-fields</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>calc parse date fields</from>
-      <to>to:quota</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>parsed quotas</from>
-      <to>output excel</to>
-      <enabled>N</enabled>
-    </hop>
-    <hop>
-      <from>to:quota</from>
-      <to>existing records</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>sf:show-fields</from>
-      <to>parsed quotas</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>parsed quotas</from>
-      <to>gsi:data</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>gsi:data</from>
-      <to>calc parse date fields</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>dg:test-data</from>
-      <to>sf:show-fields</to>
-      <enabled>N</enabled>
-    </hop>
-    <hop>
-      <from>gsi:data</from>
-      <to>Filter rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Filter rows</from>
-      <to>ad:mail</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>ad:mail</from>
+      <from>ac:mail</from>
       <to>Mail</to>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Mail</from>
+      <to>tfo:host_quota</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>gv:file_date</from>
+      <to>udje:combine_file_fields</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>udje:combine_file_fields</from>
+      <to>gfn:existing-files</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>gfn:existing-files</from>
+      <to>tfi:existing-quota</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>tfi:existing-quota</from>
+      <to>sr:owner</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sr:owner</from>
+      <to>ur:owner</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>ur:owner</from>
+      <to>fr:only-one</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:only-one</from>
+      <to>ac:mail</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:only-one</from>
+      <to>duplicate</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>ti:quota-met</from>
+      <to>des:no-quotas</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>ti:quota-met</from>
+      <to>sr:owner</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>des:no-quotas</from>
+      <to>Abort</to>
+      <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Filter rows</name>
-    <type>FilterRows</type>
+    <name>Abort</name>
+    <type>Abort</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -565,25 +575,10 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>ad:mail</send_true_to>
-    <send_false_to/>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <leftvalue>quota_pct_used</leftvalue>
-        <function>&gt;=</function>
-        <rightvalue/>
-        <value>
-          <name>constant</name>
-          <type>Number</type>
-          <text>99.0</text>
-          <length>-1</length>
-          <precision>-1</precision>
-          <isnull>N</isnull>
-          <mask>####0.0#########;-####0.0#########</mask>
-        </value>
-      </condition>
-    </compare>
+    <row_threshold>0</row_threshold>
+    <message>No Quota Rows</message>
+    <always_log_rows>N</always_log_rows>
+    <abort_option>ABORT</abort_option>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -593,8 +588,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>544</xloc>
-      <yloc>208</yloc>
+      <xloc>330</xloc>
+      <yloc>30</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -612,7 +607,7 @@
     <server>smtp-server</server>
     <port>smtp-port</port>
     <destination>dest-addr</destination>
-    <destinationCc/>
+    <destinationCc>cc-addr</destinationCc>
     <destinationBCc/>
     <replyToAddresses/>
     <replyto>send-addr</replyto>
@@ -628,11 +623,11 @@
     <dynamicFieldname/>
     <dynamicWildcard/>
     <dynamicZipFilename/>
-    <sourcefilefoldername/>
-    <sourcewildcard/>
+    <sourcefilefoldername>${PROJECT_INPUT}/complete</sourcefilefoldername>
+    <sourcewildcard>mon.*${file_date}.zip</sourcewildcard>
     <contact_person/>
     <contact_phone/>
-    <comment>quota_range</comment>
+    <comment>mail_message</comment>
     <include_files>N</include_files>
     <zip_files>N</zip_files>
     <zip_name/>
@@ -645,8 +640,8 @@
     <use_HTML>N</use_HTML>
     <use_Priority>Y</use_Priority>
     <encoding>UTF-8</encoding>
-    <priority>normal</priority>
-    <importance>high</importance>
+    <priority>high</priority>
+    <importance>normal</importance>
     <sensitivity>normal</sensitivity>
     <secureconnectiontype>TLS</secureconnectiontype>
     <embeddedimages>
@@ -660,13 +655,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>656</xloc>
-      <yloc>368</yloc>
+      <xloc>870</xloc>
+      <yloc>120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>ad:mail</name>
+    <name>ac:mail</name>
     <type>Constant</type>
     <description/>
     <distribute>Y</distribute>
@@ -768,7 +763,19 @@
         <currency/>
         <decimal/>
         <group/>
-        <nullif>User has exceeded their quota</nullif>
+        <nullif>Quota Limit Reached</nullif>
+        <length>-1</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>cc-addr</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>7732514254@vtext.com</nullif>
         <length>-1</length>
         <precision>-1</precision>
         <set_empty_string>N</set_empty_string>
@@ -783,14 +790,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>592</xloc>
-      <yloc>288</yloc>
+      <xloc>780</xloc>
+      <yloc>120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>calc parse date fields</name>
-    <type>Calculator</type>
+    <name>des:no-quotas</name>
+    <type>DetectEmptyStream</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -799,397 +806,6 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <failIfNoFile>N</failIfNoFile>
-    <calculation>
-      <field_name>YEAR</field_name>
-      <calc_type>YEAR_OF_DATE</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MONTH_YEAR</field_name>
-      <calc_type>MONTH_OF_DATE</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>DAY_MONTH</field_name>
-      <calc_type>DAY_OF_MONTH</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>DAY_YEAR</field_name>
-      <calc_type>DAY_OF_YEAR</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>DAY_WEEK</field_name>
-      <calc_type>DAY_OF_WEEK</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>WEEK_YEAR</field_name>
-      <calc_type>WEEK_OF_YEAR</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>WEEKS_IN_YEAR</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>52</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>Y</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MONTHS_IN_YEAR</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>12</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>Y</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>DAYS_IN_YEAR</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>365</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>Y</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>HOUR_DAY</field_name>
-      <calc_type>HOUR_OF_DAY</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>None</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MINUTE_HOUR</field_name>
-      <calc_type>MINUTE_OF_HOUR</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>None</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>SECOND_MINUTE</field_name>
-      <calc_type>SECOND_OF_MINUTE</calc_type>
-      <field_a>sys_date</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>None</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>HOURS_IN_DAY</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>24</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>Y</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>HOUR_YEAR</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>HOUR_DAY</field_a>
-      <field_b>DAY_YEAR</field_b>
-      <field_c>HOURS_IN_DAY</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MINUTES_IN_HOUR</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>60</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>Y</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MINUTE_YEAR</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>MINUTE_HOUR</field_a>
-      <field_b>HOUR_YEAR</field_b>
-      <field_c>MINUTES_IN_HOUR</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MINUTES_IN_SECOND</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>60</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>Y</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>SECOND_YEAR</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>SECOND_MINUTE</field_a>
-      <field_b>MINUTE_YEAR</field_b>
-      <field_c>MINUTES_IN_SECOND</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>WEEK_ALLTIME</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>WEEK_YEAR</field_a>
-      <field_b>YEAR</field_b>
-      <field_c>WEEKS_IN_YEAR</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MONTH_ALLTIME</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>MONTH_YEAR</field_a>
-      <field_b>YEAR</field_b>
-      <field_c>MONTHS_IN_YEAR</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>DAY_ALLTIME</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>DAY_YEAR</field_a>
-      <field_b>DAYS_IN_YEAR</field_b>
-      <field_c>YEAR</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>HOUR_ALLTIME</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>HOUR_YEAR</field_a>
-      <field_b>HOURS_IN_DAY</field_b>
-      <field_c>DAY_ALLTIME</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>SECONDS_IN_HOUR</field_name>
-      <calc_type>CONSTANT</calc_type>
-      <field_a>3600</field_a>
-      <field_b/>
-      <field_c/>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>SECOND_ALLTIME</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>SECOND_YEAR</field_a>
-      <field_b>HOUR_ALLTIME</field_b>
-      <field_c>SECONDS_IN_HOUR</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>MINUTE_DAY</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>MINUTE_HOUR</field_a>
-      <field_b>HOUR_DAY</field_b>
-      <field_c>MINUTES_IN_HOUR</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <calculation>
-      <field_name>SECOND_DAY</field_name>
-      <calc_type>COMBINATION_1</calc_type>
-      <field_a>SECOND_MINUTE</field_a>
-      <field_b>MINUTE_DAY</field_b>
-      <field_c>MINUTES_IN_SECOND</field_c>
-      <value_type>Integer</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1199,59 +815,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>624</xloc>
-      <yloc>128</yloc>
+      <xloc>240</xloc>
+      <yloc>30</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>dg:test-data</name>
-    <type>DataGrid</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>text</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <length>126</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-    <data>
-      <line>
-        <item>10.0.0.299 100.00</item>
-      </line>
-      <line>
-        <item>10.0.0.223 51.0</item>
-      </line>
-    </data>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>272</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>existing records</name>
+    <name>duplicate</name>
     <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
@@ -1270,16 +840,105 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>736</xloc>
-      <yloc>224</yloc>
+      <xloc>630</xloc>
+      <yloc>210</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>gsi:data</name>
-    <type>SystemInfo</type>
+    <name>fr:only-one</name>
+    <type>FilterRows</type>
     <description/>
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>ac:mail</send_true_to>
+    <send_false_to>duplicate</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>owner_count</leftvalue>
+        <function>&lt;=</function>
+        <rightvalue/>
+        <value>
+          <name>constant</name>
+          <type>Integer</type>
+          <text>1</text>
+          <length>-1</length>
+          <precision>0</precision>
+          <isnull>N</isnull>
+          <mask>####0;-####0</mask>
+        </value>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>120</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>gfn:existing-files</name>
+    <type>GetFileNames</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filter>
+      <filterfiletype>all_files</filterfiletype>
+    </filter>
+    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <rownum>N</rownum>
+    <isaddresult>N</isaddresult>
+    <filefield>Y</filefield>
+    <rownum_field/>
+    <filename_Field>file_path</filename_Field>
+    <wildcard_Field>file_expr</wildcard_Field>
+    <exclude_wildcard_Field/>
+    <dynamic_include_subfolders>N</dynamic_include_subfolders>
+    <limit>0</limit>
+    <file>
+      <name/>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>330</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>gv:file_date</name>
+    <type>GetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
     <custom_distribution/>
     <copies>1</copies>
     <partitioning>
@@ -1288,8 +947,28 @@
     </partitioning>
     <fields>
       <field>
-        <name>sys_date</name>
-        <type>system date (fixed)</type>
+        <name>file_date</name>
+        <variable>${file_date}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+      </field>
+      <field>
+        <name>project_output</name>
+        <variable>${PROJECT_OUTPUT}</variable>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <length>128</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
       </field>
     </fields>
     <attributes/>
@@ -1301,14 +980,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>544</xloc>
-      <yloc>128</yloc>
+      <xloc>90</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>output excel</name>
-    <type>ExcelOutput</type>
+    <name>sr:owner</name>
+    <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1317,64 +996,158 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>quota_owner</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>450</xloc>
+      <yloc>120</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>tfi:existing-quota</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field>filename</accept_field>
+    <accept_stepname>gfn:existing-files</accept_stepname>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
     <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
     <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>Unix</format>
     <encoding/>
-    <append>N</append>
+    <length>Characters</length>
     <add_to_result_filenames>Y</add_to_result_filenames>
     <file>
       <name>${PROJECT_OUTPUT}/quota</name>
-      <extention>xls</extention>
-      <do_not_open_newfile_init>N</do_not_open_newfile_init>
-      <create_parent_folder>N</create_parent_folder>
-      <split>N</split>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <SpecifyFormat>Y</SpecifyFormat>
-      <date_time_format>yyyyMMddHHmmss</date_time_format>
-      <sheetname>quota</sheetname>
-      <autosizecolums>N</autosizecolums>
-      <nullisblank>N</nullisblank>
-      <protect_sheet>N</protect_sheet>
-      <password>Encrypted </password>
-      <splitevery>0</splitevery>
-      <usetempfiles>N</usetempfiles>
-      <tempdirectory/>
+      <filemask>${file_date}.txt</filemask>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
     </file>
-    <template>
-      <enabled>N</enabled>
-      <append>N</append>
-      <filename>template.xls</filename>
-    </template>
+    <filters>
+    </filters>
     <fields>
       <field>
-        <name>quota_range</name>
+        <name>quota_owner</name>
         <type>String</type>
         <format/>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif>-</nullif>
+        <ifnull/>
+        <position>-1</position>
+        <length>13</length>
+        <precision>-1</precision>
+        <trim_type>right</trim_type>
+        <repeat>N</repeat>
       </field>
       <field>
         <name>quota_pct_used</name>
         <type>Number</type>
-        <format>#0.0000</format>
+        <format>#.#</format>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif>-</nullif>
+        <ifnull/>
+        <position>-1</position>
+        <length>5</length>
+        <precision>3</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>mail_message</name>
+        <type>String</type>
+        <format/>
+        <currency>$</currency>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif>-</nullif>
+        <ifnull/>
+        <position>-1</position>
+        <length>128</length>
+        <precision>-1</precision>
+        <trim_type>right</trim_type>
+        <repeat>N</repeat>
       </field>
     </fields>
-    <custom>
-      <header_font_name>arial</header_font_name>
-      <header_font_size>10</header_font_size>
-      <header_font_bold>N</header_font_bold>
-      <header_font_italic>N</header_font_italic>
-      <header_font_underline>no</header_font_underline>
-      <header_font_orientation>horizontal</header_font_orientation>
-      <header_font_color>black</header_font_color>
-      <header_background_color>none</header_background_color>
-      <header_row_height>255</header_row_height>
-      <header_alignment>left</header_alignment>
-      <header_image/>
-      <row_font_name>arial</row_font_name>
-      <row_font_size>10</row_font_size>
-      <row_font_color>black</row_font_color>
-      <row_background_color>none</row_background_color>
-    </custom>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1384,14 +1157,107 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>448</xloc>
-      <yloc>208</yloc>
+      <xloc>450</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>parsed quotas</name>
-    <type>Dummy</type>
+    <name>tfo:host_quota</name>
+    <type>TextFileOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <enclosure_forced>N</enclosure_forced>
+    <enclosure_fix_disabled>N</enclosure_fix_disabled>
+    <header>Y</header>
+    <footer>N</footer>
+    <format>UNIX</format>
+    <compression>None</compression>
+    <encoding/>
+    <endedLine/>
+    <fileNameInField>N</fileNameInField>
+    <fileNameField/>
+    <create_parent_folder>Y</create_parent_folder>
+    <file>
+      <name>${PROJECT_OUTPUT}/quota/${file_date}</name>
+      <servlet_output>N</servlet_output>
+      <do_not_open_new_file_init>Y</do_not_open_new_file_init>
+      <extention>txt</extention>
+      <append>N</append>
+      <split>N</split>
+      <haspartno>N</haspartno>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format/>
+      <add_to_result_filenames>Y</add_to_result_filenames>
+      <pad>N</pad>
+      <fast_dump>N</fast_dump>
+      <splitevery/>
+    </file>
+    <fields>
+      <field>
+        <name>quota_owner</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>right</trim_type>
+        <length>13</length>
+        <precision>-1</precision>
+      </field>
+      <field>
+        <name>quota_pct_used</name>
+        <type>Number</type>
+        <format>####0.0#########;-####0.0#########</format>
+        <currency/>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif/>
+        <trim_type>none</trim_type>
+        <length>9</length>
+        <precision>4</precision>
+      </field>
+      <field>
+        <name>mail_message</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif/>
+        <trim_type>right</trim_type>
+        <length>128</length>
+        <precision>-1</precision>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>990</xloc>
+      <yloc>120</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ti:quota-met</name>
+    <type>TableInput</type>
     <description/>
     <distribute>N</distribute>
     <custom_distribution/>
@@ -1400,66 +1266,92 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>448</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>sf:show-fields</name>
-    <type>FieldSplitter</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <splitfield>text</splitfield>
-    <delimiter> </delimiter>
-    <enclosure/>
-    <fields>
-      <field>
-        <name>quota_range</name>
-        <id/>
-        <idrem>N</idrem>
+    <connection>gargoyle_bwmon</connection>
+    <sql>select t3.quota_owner, quota_pct_used
+, t3.quota_owner ||':'|| t3.quota || ':'|| quota_pct_used as mail_message
+FROM "public".f_quota_event t1
+INNER JOIN public.dim_date t2 ON t2.date_key = t1.date_key and t2."DATE" >= to_timestamp('${file_date}', 'YYYY-MM-DD-HH24-MI-SS')
+INNER JOIN public.dim_quota t3 on t3.quota_key = t1.quota_key
+where t1.date_key = (select max(date_key) from public.f_quota_event t99 where t99.quota_key = t1.quota_key)
+  AND t1.quota_pct_used >= ${quota_limit}
+</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
         <type>String</type>
-        <format/>
-        <group/>
-        <decimal/>
-        <currency/>
-        <length>35</length>
+        <storagetype>normal</storagetype>
+        <name>quota_owner</name>
+        <length>13</length>
         <precision>-1</precision>
-        <nullif/>
-        <ifnull/>
-        <trimtype>both</trimtype>
-      </field>
-      <field>
-        <name>quota_pct_used</name>
-        <id/>
-        <idrem>N</idrem>
+        <origin>ti:quota-met</origin>
+        <comments>quota_owner</comments>
+        <conversion_Mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_US</date_format_locale>
+        <date_format_timezone>America/Chicago</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
         <type>Number</type>
-        <format/>
-        <group/>
-        <decimal/>
-        <currency/>
-        <length>5</length>
+        <storagetype>normal</storagetype>
+        <name>quota_pct_used</name>
+        <length>9</length>
         <precision>4</precision>
-        <nullif/>
-        <ifnull/>
-        <trimtype>both</trimtype>
-      </field>
-    </fields>
+        <origin>ti:quota-met</origin>
+        <comments>quota_pct_used</comments>
+        <conversion_Mask>####0.0#########;-####0.0#########</conversion_Mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_US</date_format_locale>
+        <date_format_timezone>America/Chicago</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>mail_message</name>
+        <length>2147483647</length>
+        <precision>-1</precision>
+        <origin>ti:quota-met</origin>
+        <comments>mail_message</comments>
+        <conversion_Mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_US</date_format_locale>
+        <date_format_timezone>America/Chicago</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1469,14 +1361,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>352</xloc>
-      <yloc>128</yloc>
+      <xloc>120</xloc>
+      <yloc>120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>sr:parse-stdOut</name>
-    <type>SplitFieldToRows3</type>
+    <name>udje:combine_file_fields</name>
+    <type>Janino</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1485,13 +1377,22 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <splitfield>stdOut</splitfield>
-    <delimiter>\n</delimiter>
-    <newfield>text</newfield>
-    <rownum>Y</rownum>
-    <rownum_field>row_nbr</rownum_field>
-    <resetrownumber>Y</resetrownumber>
-    <delimiter_is_regex>Y</delimiter_is_regex>
+    <formula>
+      <field_name>file_path</field_name>
+      <formula_string>project_output +"/quota"</formula_string>
+      <value_type>String</value_type>
+      <value_length>256</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
+    <formula>
+      <field_name>file_expr</field_name>
+      <formula_string>file_date.substring(0,10) +".*"</formula_string>
+      <value_type>String</value_type>
+      <value_length>50</value_length>
+      <value_precision>-1</value_precision>
+      <replace_field/>
+    </formula>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -1501,14 +1402,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>192</xloc>
-      <yloc>128</yloc>
+      <xloc>210</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>ssh get quotas</name>
-    <type>SSH</type>
+    <name>ur:owner</name>
+    <type>Unique</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -1517,53 +1418,15 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <dynamicCommandField>N</dynamicCommandField>
-    <command>/root/scripts/run_get_quotas.sh</command>
-    <commandfieldname/>
-    <port>${GARGOYLE_PORT}</port>
-    <servername>${GARGOYLE_HOST}</servername>
-    <userName>${GARGOYLE_USER}</userName>
-    <password>${GARGOYLE_PASS}</password>
-    <usePrivateKey>Y</usePrivateKey>
-    <keyFileName>/home/agrohe21/.ssh/gargoyle</keyFileName>
-    <passPhrase>Encrypted </passPhrase>
-    <stdOutFieldName>stdOut</stdOutFieldName>
-    <stdErrFieldName>stdErr</stdErrFieldName>
-    <timeOut>0</timeOut>
-    <proxyHost/>
-    <proxyPort/>
-    <proxyUsername/>
-    <proxyPassword>Encrypted </proxyPassword>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>96</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>sv:text</name>
-    <type>SelectValues</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
+    <count_rows>Y</count_rows>
+    <count_field>owner_count</count_field>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <error_description/>
     <fields>
       <field>
-        <name>text</name>
+        <name>quota_owner</name>
+        <case_insensitive>N</case_insensitive>
       </field>
-      <select_unspecified>N</select_unspecified>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -1574,75 +1437,15 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>272</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>to:quota</name>
-    <type>TableOutput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>gargoyle_mon</connection>
-    <schema/>
-    <table>GARGOYLE_QUOTA</table>
-    <commit>10000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>N</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>736</xloc>
-      <yloc>128</yloc>
+      <xloc>540</xloc>
+      <yloc>120</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
-    <error>
-      <source_step>to:quota</source_step>
-      <target_step>existing records</target_step>
-      <is_enabled>Y</is_enabled>
-      <nr_valuename/>
-      <descriptions_valuename/>
-      <fields_valuename/>
-      <codes_valuename/>
-      <max_errors/>
-      <max_pct_errors/>
-      <min_pct_rows/>
-    </error>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
-  <attributes>
-    <group>
-      <name>explorerState</name>
-    </group>
-  </attributes>
+  <attributes/>
 </transformation>

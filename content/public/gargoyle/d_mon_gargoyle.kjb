@@ -1,20 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>run_bwmon_gather</name>
+  <name>d_mon_gargoyle</name>
   <description/>
   <extended_description/>
   <job_version/>
+  <job_status>0</job_status>
   <directory>/</directory>
-  <created_user>-</created_user>
-  <created_date>2020/02/18 13:47:30.839</created_date>
-  <modified_user>-</modified_user>
-  <modified_date>2020/02/18 13:47:30.839</modified_date>
+  <created_user/>
+  <created_date>2015/10/22 13:54:46.554</created_date>
+  <modified_user>admin</modified_user>
+  <modified_date>2015/12/08 09:47:58.322</modified_date>
   <parameters>
-    </parameters>
+    <parameter>
+      <name>GEN_ROW_DIR</name>
+      <default_value>/public/util</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>GEN_ROW_INTERVAL</name>
+      <default_value>60000</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>GEN_ROW_KTR</name>
+      <default_value>rowInput</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>LOOP_INTERVAL</name>
+      <default_value>10</default_value>
+      <description>Seconds</description>
+    </parameter>
+    <parameter>
+      <name>MON_DIR</name>
+      <default_value>/public/monitor</default_value>
+      <description/>
+    </parameter>
+    <parameter>
+      <name>MON_KTR</name>
+      <default_value>mon_invalid</default_value>
+      <description>Should be mon_jvm, mon_sys</description>
+    </parameter>
+    <parameter>
+      <name>current_attempt</name>
+      <default_value>0</default_value>
+      <description>Valid in the root job</description>
+    </parameter>
+    <parameter>
+      <name>max_tries</name>
+      <default_value>3</default_value>
+      <description>Valid in the root job</description>
+    </parameter>
+  </parameters>
+  <connection>
+    <name>live_logging_info</name>
+    <server>${KETTLE_LOG_HOSTNAME}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${KETTLE_LOG_DB}</database>
+    <port>${KETTLE_LOG_PORT}</port>
+    <username>${KETTLE_LOG_USERNAME}</username>
+    <password>${KETTLE_LOG_PASS}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>${KETTLE_LOG_PORT}</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
   <slaveservers>
-    </slaveservers>
+    <slaveserver>
+      <name>Cluster1Master</name>
+      <hostname>${MON_CLUSTER1_MASTER_HOST}</hostname>
+      <port>9080</port>
+      <webAppName>pentaho-di</webAppName>
+      <username>admin</username>
+      <password>Encrypted 2be98afc86aa7f2e4bb18bd63c99dbdde</password>
+      <proxy_hostname/>
+      <proxy_port/>
+      <non_proxy_hosts/>
+      <master>Y</master>
+      <sslMode>N</sslMode>
+    </slaveserver>
+    <slaveserver>
+      <name>Cluster1Slave1</name>
+      <hostname>192.168.92.129</hostname>
+      <port>9081</port>
+      <webAppName/>
+      <username>cluster</username>
+      <password>Encrypted 2be98afc86aa7f2e4cb1aa265cd86aac8</password>
+      <proxy_hostname/>
+      <proxy_port/>
+      <non_proxy_hosts/>
+      <master>N</master>
+      <sslMode>N</sslMode>
+    </slaveserver>
+    <slaveserver>
+      <name>Cluster1Slave2</name>
+      <hostname>192.168.92.129</hostname>
+      <port>9082</port>
+      <webAppName/>
+      <username>cluster</username>
+      <password>Encrypted 2be98afc86aa7f2e4cb1aa265cd86aac8</password>
+      <proxy_hostname/>
+      <proxy_port/>
+      <non_proxy_hosts/>
+      <master>N</master>
+      <sslMode>N</sslMode>
+    </slaveserver>
+  </slaveservers>
   <job-log-table>
-    <connection/>
+    <connection>live_logging_info</connection>
     <schema/>
     <table/>
     <size_limit_lines/>
@@ -107,22 +238,22 @@
     </field>
     <field>
       <id>EXECUTING_SERVER</id>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <name>EXECUTING_SERVER</name>
     </field>
     <field>
       <id>EXECUTING_USER</id>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <name>EXECUTING_USER</name>
     </field>
     <field>
       <id>START_JOB_ENTRY</id>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <name>START_JOB_ENTRY</name>
     </field>
     <field>
       <id>CLIENT</id>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <name>CLIENT</name>
     </field>
   </job-log-table>
@@ -208,12 +339,12 @@
     </field>
     <field>
       <id>LOG_FIELD</id>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <name>LOG_FIELD</name>
     </field>
     <field>
       <id>COPY_NR</id>
-      <enabled>N</enabled>
+      <enabled>Y</enabled>
       <name>COPY_NR</name>
     </field>
   </jobentry-log-table>
@@ -283,11 +414,11 @@
       <name>ROOT_CHANNEL_ID</name>
     </field>
   </channel-log-table>
-  <pass_batchid>N</pass_batchid>
+  <pass_batchid>Y</pass_batchid>
   <shared_objects_file/>
   <entries>
     <entry>
-      <name>Start</name>
+      <name>START</name>
       <description/>
       <type>SPECIAL</type>
       <attributes/>
@@ -305,220 +436,59 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>64</xloc>
-      <yloc>64</yloc>
+      <yloc>120</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>ktr-gargoyle_bwmon</name>
+      <name>trans_mon</name>
       <description/>
       <type>TRANS</type>
       <attributes/>
       <specification_method>filename</specification_method>
       <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_bwmon.ktr</filename>
+      <filename>${PROJECT_CONTENT}\public\${PROJECT_NAME}\${MON_KTR}.ktr</filename>
       <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
       <clear_rows>N</clear_rows>
       <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>400</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>sv:project-properties</name>
-      <description/>
-      <type>SET_VARIABLES</type>
-      <attributes/>
-      <replacevars>Y</replacevars>
-      <filename>${PROJECT_DIR}/${PROJECT_NAME}/config/${PROJECT_NAME}.properties</filename>
-      <file_variable_type>JVM</file_variable_type>
-      <fields>
-      </fields>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>256</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>Write to log</name>
-      <description/>
-      <type>WRITE_TO_LOG</type>
-      <attributes/>
-      <logmessage/>
+      <set_logfile>Y</set_logfile>
+      <logfile>${PROJECT_DIR}/log/gargoyle/${MON_KTR}</logfile>
+      <logext>log</logext>
+      <add_date>Y</add_date>
+      <add_time>Y</add_time>
       <loglevel>Detailed</loglevel>
-      <logsubject>Running: ${Internal.Job.Name}</logsubject>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>144</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>ktr-gargoyle_webmon</name>
-      <description/>
-      <type>TRANS</type>
-      <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_webmon.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
       <cluster>N</cluster>
       <slave_server_name/>
       <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
+      <create_parent_folder>Y</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
+      <run_configuration/>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>GEN_ROW_INTERVAL</name>
+          <stream_name/>
+          <value>${GEN_ROW_INTERVAL}</value>
+        </parameter>
+        <parameter>
+          <name>GEN_ROW_KTR</name>
+          <stream_name/>
+          <value>${GEN_ROW_KTR}</value>
+        </parameter>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>64</yloc>
+      <xloc>420</xloc>
+      <yloc>120</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>ktr-gargoyle_quota</name>
-      <description/>
-      <type>TRANS</type>
-      <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_quota.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>688</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>ktr-gargoyle_hosts</name>
-      <description/>
-      <type>TRANS</type>
-      <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${Internal.Entry.Current.Directory}/ssh_gargoyle_hosts.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>832</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>abort_bwmon</name>
-      <description/>
-      <type>ABORT</type>
-      <attributes/>
-      <message/>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>384</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>Success</name>
-      <description/>
-      <type>SUCCESS</type>
-      <attributes/>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>944</xloc>
-      <yloc>64</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>Dummy</name>
+      <name>DUMMY</name>
       <description/>
       <type>SPECIAL</type>
       <attributes/>
@@ -535,8 +505,136 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>208</yloc>
+      <xloc>270</xloc>
+      <yloc>120</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Wait for</name>
+      <description/>
+      <type>DELAY</type>
+      <attributes/>
+      <maximumTimeout>${LOOP_INTERVAL}</maximumTimeout>
+      <scaletime>0</scaletime>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>270</xloc>
+      <yloc>288</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>increase tries</name>
+      <description>JavaScript</description>
+      <type>EVAL</type>
+      <attributes/>
+      <script>var attempt = parseInt(parent_job.getVariable("current_attempt"), 10);
+attempt++;
+parent_job.setVariable("current_attempt", attempt);
+
+true;
+</script>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>420</xloc>
+      <yloc>288</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>should retry?</name>
+      <description>Simple evaluation</description>
+      <type>SIMPLE_EVAL</type>
+      <attributes/>
+      <valuetype>variable</valuetype>
+      <fieldname/>
+      <variablename>${current_attempt}</variablename>
+      <fieldtype>string</fieldtype>
+      <mask/>
+      <comparevalue>${max_tries}</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successcondition>different</successcondition>
+      <successnumbercondition>equal</successnumbercondition>
+      <successbooleancondition>true</successbooleancondition>
+      <successwhenvarset>N</successwhenvarset>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>270</xloc>
+      <yloc>368</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Report Failed Attempt</name>
+      <description>Write To Log</description>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <logmessage/>
+      <loglevel>Basic</loglevel>
+      <logsubject>${PROJECT_NAME}:${MON_KTR}  failed for the ${current_attempt} time ... Retrying up to ${max_tries} times...</logsubject>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>420</xloc>
+      <yloc>368</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Abort job</name>
+      <description>Abort job</description>
+      <type>ABORT</type>
+      <attributes/>
+      <message>${PROJECT_NAME}:${MON_KTR} aborted due to max_tries reached</message>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>270</xloc>
+      <yloc>630</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Report Failed Job</name>
+      <description>Write To Log</description>
+      <type>WRITE_TO_LOG</type>
+      <attributes/>
+      <logmessage>Daemon failure</logmessage>
+      <loglevel>Minimal</loglevel>
+      <logsubject>${PROJECT_NAME}:${MON_KTR} failed maximum times: ${max_tries}.</logsubject>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>270</xloc>
+      <yloc>448</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Success</name>
+      <description/>
+      <type>SUCCESS</type>
+      <attributes/>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>510</xloc>
+      <yloc>120</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Set variables</name>
+      <description/>
+      <type>SET_VARIABLES</type>
+      <attributes/>
+      <replacevars>Y</replacevars>
+      <filename>${PROJECT_DIR}/${PROJECT_NAME}/config/${PROJECT_NAME}.properties</filename>
+      <file_variable_type>ROOT_JOB</file_variable_type>
+      <fields>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>176</xloc>
+      <yloc>120</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -551,25 +649,19 @@
       <destinationBCc/>
       <replyto>agrohe21@gmail.com</replyto>
       <replytoname>Gargoyle</replytoname>
-      <subject>Gargloy bwmon Failed</subject>
+      <subject>Gargoyle Monitor Failed:${current_attempt}:${max_tries}</subject>
       <include_date>Y</include_date>
       <contact_person/>
       <contact_phone/>
-      <comment>${GARGOYLE_BWMON_DATABASE}
-${GARGOYLE_BWMON_DATA_SERVER}
-${GARGOYLE_BWMON_DOWNLOAD}
-${GARGOYLE_BWMON_UPLOAD}
-${GARGOYLE_BWMON_USER}
-${GARGOYLE_HOST}
-${GARGOYLE_USER}</comment>
-      <include_files>N</include_files>
+      <comment>${logtext}</comment>
+      <include_files>Y</include_files>
       <zip_files>N</zip_files>
       <zip_name/>
       <use_auth>Y</use_auth>
       <use_secure_auth>Y</use_secure_auth>
       <auth_user>agrohe21@gmail.com</auth_user>
       <auth_password>Encrypted 2d4ffc8be05d29b88a303b871cb83a0c0</auth_password>
-      <only_comment>Y</only_comment>
+      <only_comment>N</only_comment>
       <use_HTML>N</use_HTML>
       <use_Priority>N</use_Priority>
       <encoding>UTF-8</encoding>
@@ -578,21 +670,63 @@ ${GARGOYLE_USER}</comment>
       <sensitivity>normal</sensitivity>
       <secureconnectiontype>TLS</secureconnectiontype>
       <replyToAddresses/>
-      <filetypes>      </filetypes>
+      <filetypes>
+        <filetype>LOG</filetype>
+        <filetype>ERRORLINE</filetype>
+        <filetype>ERROR</filetype>
+      </filetypes>
       <embeddedimages>
       </embeddedimages>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>304</yloc>
+      <xloc>270</xloc>
+      <yloc>540</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>t:get_prev_jobentry_log</name>
+      <description/>
+      <type>TRANS</type>
+      <attributes/>
+      <specification_method>filename</specification_method>
+      <trans_object_id/>
+      <filename>${PROJECT_CONTENT}/public/util/get_jobentry_log.ktr</filename>
+      <transname/>
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile/>
+      <logext/>
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration/>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>420</xloc>
+      <yloc>210</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
   <hops>
     <hop>
-      <from>sv:project-properties</from>
-      <to>ktr-gargoyle_bwmon</to>
+      <from>Wait for</from>
+      <to>DUMMY</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -600,17 +734,8 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>Start</from>
-      <to>Write to log</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>Write to log</from>
-      <to>sv:project-properties</to>
+      <from>increase tries</from>
+      <to>Report Failed Attempt</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -618,8 +743,8 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_bwmon</from>
-      <to>ktr-gargoyle_webmon</to>
+      <from>Report Failed Attempt</from>
+      <to>should retry?</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -627,8 +752,8 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_webmon</from>
-      <to>ktr-gargoyle_quota</to>
+      <from>should retry?</from>
+      <to>Wait for</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -636,16 +761,16 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_quota</from>
-      <to>ktr-gargoyle_hosts</to>
+      <from>should retry?</from>
+      <to>Report Failed Job</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
+      <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_hosts</from>
+      <from>trans_mon</from>
       <to>Success</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -654,53 +779,8 @@ ${GARGOYLE_USER}</comment>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>ktr-gargoyle_webmon</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ktr-gargoyle_bwmon</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>sv:project-properties</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ktr-gargoyle_quota</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>ktr-gargoyle_hosts</from>
-      <to>Dummy</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>Dummy</from>
-      <to>Mail</to>
+      <from>START</from>
+      <to>Set variables</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -708,8 +788,53 @@ ${GARGOYLE_USER}</comment>
       <unconditional>Y</unconditional>
     </hop>
     <hop>
+      <from>Set variables</from>
+      <to>DUMMY</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>DUMMY</from>
+      <to>trans_mon</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>trans_mon</from>
+      <to>t:get_prev_jobentry_log</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>t:get_prev_jobentry_log</from>
+      <to>increase tries</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
+      <from>Report Failed Job</from>
+      <to>Mail</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>Y</unconditional>
+    </hop>
+    <hop>
       <from>Mail</from>
-      <to>abort_bwmon</to>
+      <to>Abort job</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -721,14 +846,11 @@ ${GARGOYLE_USER}</comment>
   </notepads>
   <attributes>
     <group>
-      <name>METASTORE.pentaho</name>
+      <name>JobRestart</name>
       <attribute>
-        <key>Default Run Configuration</key>
-        <value>{"namespace":"pentaho","id":"Default Run Configuration","name":"Default Run Configuration","description":"Defines a default run configuration","metaStoreName":null}</value>
+        <key>UniqueConnections</key>
+        <value>N</value>
       </attribute>
-    </group>
-    <group>
-      <name>{"_":"Embedded MetaStore Elements","namespace":"pentaho","type":"Default Run Configuration"}</name>
     </group>
   </attributes>
 </job>

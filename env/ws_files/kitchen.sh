@@ -1,0 +1,21 @@
+#!/bin/bash
+export PROJECT_NAME=gargoyle
+export KETTLE_CLIENT_DIR=/home/agrohe21/tools/pentaho/9.0CE/data-integration
+
+export PROJECT_DIR=/home/agrohe21/projects
+
+cd $(dirname $0)
+
+export KETTLE_HOME=`pwd`
+
+export PROJECT_INPUT=$PROJECT_DIR/$PROJECT_NAME/input
+export PROJECT_OUTPUT=$PROJECT_DIR/$PROJECT_NAME/output
+export PROJECT_CONFIG=$PROJECT_DIR/$PROJECT_NAME/config
+export PROJECT_CONTENT=$PROJECT_DIR/$PROJECT_NAME/content
+
+export OPT="-DPROJECT_NAME=$PROJECT_NAME -DPROJECT_DIR=$PROJECT_DIR -DPROJECT_INPUT=$PROJECT_INPUT -DPROJECT_OUTPUT=$PROJECT_OUTPUT -DPROJECT_CONFIG=$PROJECT_CONFIG -DPROJECT_CONTENT=$PROJECT_CONTENT"
+
+cd $KETTLE_CLIENT_DIR
+./kitchen.sh -maxloglines=0 -maxlogtimeout=0 $OPT "$@"
+cd $KETTLE_HOME
+
