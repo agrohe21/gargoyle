@@ -2,8 +2,11 @@
 export PROJECT_NAME=gargoyle
 export KETTLE_CLIENT_DIR=/home/agrohe21/tools/pentaho/9.0CE/data-integration
 
-export KETTLE_HOME=`pwd`
 export PROJECT_DIR=/home/agrohe21/projects
+
+cd $(dirname $0)
+
+export KETTLE_HOME=`pwd`
 
 export PROJECT_INPUT=$PROJECT_DIR/$PROJECT_NAME/input
 export PROJECT_OUTPUT=$PROJECT_DIR/$PROJECT_NAME/output

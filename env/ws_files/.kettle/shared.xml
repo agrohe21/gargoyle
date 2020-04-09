@@ -27,7 +27,7 @@
   </connection>
 
   <connection>
-    <name>gargoyle_mon</name>
+    <name>gargoyle_bwmon</name>
     <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>

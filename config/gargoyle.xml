@@ -1,118 +1,232 @@
-<Schema name="gargoyle" description="Gargoyle">
-  <Cube name="gargoyle_bwmon" caption="Gargoyle Bandwidth" visible="true" cache="false" enabled="true">
-    <Table name="GARGOYLE_BWMON" schema="PENTAHO">
+<Schema name="gargoyle" description="Gargoyle Monitoring">
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="user" caption="User">
+    <Hierarchy name="user_ip" visible="true" hasAll="true" primaryKey="host_id" caption="User">
+      <Table name="dim_hosts" schema="public">
+      </Table>
+      <Level name="user" visible="true" column="host_owner" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="Owner">
+      </Level>
+      <Level approxRowCount="100" name="ip_address" visible="true" column="host_ip" nameColumn="host_name" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="IP">
+        <Property name="host_mac" column="host_mac" type="String" caption="Host MAC">
+        </Property>
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="ip" visible="true" hasAll="true" primaryKey="host_id" caption="IP Address">
+      <Table name="dim_hosts" schema="public">
+      </Table>
+      <Level name="ip_address" visible="true" column="host_ip" nameColumn="host_name" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="IP">
+        <Property name="host_mac" column="host_mac" type="String" caption="Host MAC">
+        </Property>
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Dimension type="TimeDimension" visible="true" highCardinality="false" name="date" caption="Date">
+    <Hierarchy name="ymdhms" visible="true" hasAll="true" allMemberName="all_ymd" allMemberCaption="All Days of Year" primaryKey="date_key" caption="Year Month Day">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Year" visible="true" column="YEAR" type="Numeric" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never">
+        <Annotations>
+          <Annotation name="AnalyzerDateFormat">
+            <![CDATA[[yyyy]]]>
+          </Annotation>
+        </Annotations>
+      </Level>
+      <Level name="Month year" visible="true" column="month_year" type="Numeric" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
+        <Annotations>
+          <Annotation name="AnalyzerDateFormat">
+            <![CDATA[[yyyy].[M]]]>
+          </Annotation>
+        </Annotations>
+      </Level>
+      <Level name="Day month" visible="true" column="day_month" type="Numeric" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never">
+        <Annotations>
+          <Annotation name="AnalyzerDateFormat">
+            <![CDATA[[yyyy].[M].[d]]]>
+          </Annotation>
+        </Annotations>
+      </Level>
+      <Level name="hour_day" visible="true" column="hour_day" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never" caption="Hour Day">
+      </Level>
+      <Level name="minute_hour" visible="true" column="minute_hour" type="Integer" uniqueMembers="false" levelType="TimeMinutes" hideMemberIf="Never" caption="Minute Hour">
+      </Level>
+      <Level name="second_minute" visible="true" column="second_minute" type="Integer" uniqueMembers="false" levelType="TimeSeconds" hideMemberIf="Never" caption="Second Minute">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="dh" visible="true" hasAll="true" allMemberName="all_dh" allMemberCaption="All Hours of Day" primaryKey="date_key" caption="Day Hour">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Day" visible="true" column="day_alltime" type="Integer" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
+      </Level>
+      <Level name="Hour day" visible="true" column="hour_day" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="md" visible="true" hasAll="true" allMemberName="all_md" allMemberCaption="All Days of Month" primaryKey="date_key" caption="Month Day of Month">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Month" visible="true" column="month_alltime" type="Numeric" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
+      </Level>
+      <Level name="Day" visible="true" column="day_month" type="Numeric" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="ym" visible="true" hasAll="true" primaryKey="date_key" caption="Year Minute">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level approxRowCount="20" name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
+      </Level>
+      <Level approxRowCount="1000000" name="minute_year" visible="true" column="minute_year" type="Integer" internalType="long" uniqueMembers="false" levelType="TimeMinutes" hideMemberIf="Never" caption="Minute of Year">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="ys" visible="true" hasAll="true" primaryKey="date_key" caption="Year Second">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
+      </Level>
+      <Level name="sec_year" visible="true" column="second_year" type="Integer" internalType="long" uniqueMembers="false" levelType="TimeSeconds" hideMemberIf="Never" caption="Second of Year">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="yh" visible="true" hasAll="true" primaryKey="date_key" caption="Year Hour">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
+      </Level>
+      <Level name="hour_year" visible="true" column="hour_year" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never" caption="Hour Year">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="yd" visible="true" hasAll="true" primaryKey="date_key" caption="Year Day">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
+      </Level>
+      <Level name="day_year" visible="true" column="day_year" type="String" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day Year">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="yw" visible="true" hasAll="true" primaryKey="date_key" caption="Year Week">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
+      </Level>
+      <Level name="week_year" visible="true" column="week_year" type="String" uniqueMembers="false" levelType="TimeWeeks" hideMemberIf="Never" caption="Week Year">
+      </Level>
+      <Level name="day_week" visible="true" column="day_week" type="Integer" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day of Week">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="hm" visible="true" hasAll="true" primaryKey="date_key" caption="Hour Minute">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="hour_alltime" visible="true" column="hour_alltime" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never" caption="Hour Alltime">
+      </Level>
+      <Level name="minute_hour" visible="true" column="minute_hour" type="Integer" uniqueMembers="false" levelType="TimeMinutes" hideMemberIf="Never" caption="Minute Hour">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="date" visible="true" hasAll="true" primaryKey="date_key" caption="Date">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="date" visible="true" column="DATE" type="Date" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Date">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="dm" visible="true" hasAll="true" primaryKey="date_key" caption="Day Month">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="dm" visible="true" column="day_month" type="Integer" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day">
+      </Level>
+    </Hierarchy>
+    <Hierarchy name="dw" visible="true" hasAll="true" primaryKey="date_key" caption="Day Week">
+      <Table name="dim_date" schema="public">
+      </Table>
+      <Level name="dw" visible="true" column="day_week" type="Integer" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day Week">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="session" caption="Session">
+    <Hierarchy name="session_uuid" visible="true" hasAll="true" primaryKey="session_id" caption="UUID">
+      <Table name="f_session" schema="public">
+      </Table>
+      <Level approxRowCount="100000" name="session_uuid" visible="true" column="session_id" type="String" internalType="String" uniqueMembers="true" levelType="Regular" hideMemberIf="Never" caption="UUID">
+      </Level>
+    </Hierarchy>
+  </Dimension>
+  <Cube name="bw" caption="Bandwidth" visible="true" cache="false" enabled="true">
+    <Table name="f_bandwidth" schema="public">
     </Table>
-    <Dimension type="StandardDimension" visible="true" highCardinality="false" name="user" caption="User">
-      <Hierarchy name="user_ip" visible="true" hasAll="true" caption="User">
-        <Level approxRowCount="100" name="ip_address" visible="true" column="IP_ADDR" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="IP">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="ip" visible="true" hasAll="true" caption="IP Address">
-        <Level name="ip_address" visible="true" column="IP_ADDR" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="IP">
-        </Level>
-      </Hierarchy>
-    </Dimension>
-    <Dimension type="TimeDimension" visible="true" highCardinality="false" name="date" caption="Date">
-      <Hierarchy name="ymdhms" visible="true" hasAll="true" allMemberName="all_ymd" allMemberCaption="All Days of Year" caption="Year Month Day">
-        <Level name="Year" visible="true" column="YEAR" type="Numeric" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never">
-          <Annotations>
-            <Annotation name="AnalyzerDateFormat">
-              <![CDATA[[yyyy]]]>
-            </Annotation>
-          </Annotations>
-        </Level>
-        <Level name="Month year" visible="true" column="MONTH_YEAR" type="Numeric" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
-          <Annotations>
-            <Annotation name="AnalyzerDateFormat">
-              <![CDATA[[yyyy].[M]]]>
-            </Annotation>
-          </Annotations>
-        </Level>
-        <Level name="Day month" visible="true" column="DAY_MONTH" type="Numeric" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never">
-          <Annotations>
-            <Annotation name="AnalyzerDateFormat">
-              <![CDATA[[yyyy].[M].[d]]]>
-            </Annotation>
-          </Annotations>
-        </Level>
-        <Level name="hour_day" visible="true" column="HOUR_DAY" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never" caption="Hour Day">
-        </Level>
-        <Level name="minute_hour" visible="true" column="MINUTE_HOUR" type="Integer" uniqueMembers="false" levelType="TimeMinutes" hideMemberIf="Never" caption="Minute Hour">
-        </Level>
-        <Level name="second_minute" visible="true" column="SECOND_MINUTE" type="Integer" uniqueMembers="false" levelType="TimeSeconds" hideMemberIf="Never" caption="Second Minute">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="dh" visible="true" hasAll="true" allMemberName="all_dh" allMemberCaption="All Hours of Day" caption="Day Hour">
-        <Level name="Day" visible="true" column="DAY_ALLTIME" type="Integer" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
-        </Level>
-        <Level name="Hour day" visible="true" column="HOUR_DAY" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="md" visible="true" hasAll="true" allMemberName="all_md" allMemberCaption="All Days of Month" caption="Month Day of Month">
-        <Level name="Month" visible="true" column="MONTH_ALLTIME" type="Numeric" uniqueMembers="false" levelType="TimeMonths" hideMemberIf="Never">
-        </Level>
-        <Level name="Day" visible="true" column="DAY_MONTH" type="Numeric" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="ym" visible="true" hasAll="true" caption="Year Minute">
-        <Level approxRowCount="20" name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
-        </Level>
-        <Level approxRowCount="1000000" name="minute_year" visible="true" column="MINUTE_YEAR" type="Integer" internalType="long" uniqueMembers="false" levelType="TimeMinutes" hideMemberIf="Never" caption="Minute of Year">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="ys" visible="true" hasAll="true" caption="Year Second">
-        <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
-        </Level>
-        <Level name="sec_year" visible="true" column="SECOND_YEAR" type="Integer" internalType="long" uniqueMembers="false" levelType="TimeSeconds" hideMemberIf="Never" caption="Second of Year">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="yh" visible="true" hasAll="true" caption="Year Hour">
-        <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
-        </Level>
-        <Level name="hour_year" visible="true" column="HOUR_YEAR" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never" caption="Hour Year">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="yd" visible="true" hasAll="true" caption="Year Day">
-        <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
-        </Level>
-        <Level name="day_year" visible="true" column="DAY_YEAR" type="String" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day Year">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="yw" visible="true" hasAll="true" caption="Year Week">
-        <Level name="Year" visible="true" column="YEAR" type="Integer" uniqueMembers="false" levelType="TimeYears" hideMemberIf="Never" caption="Year">
-        </Level>
-        <Level name="week_year" visible="true" column="WEEK_YEAR" type="String" uniqueMembers="false" levelType="TimeWeeks" hideMemberIf="Never" caption="Week Year">
-        </Level>
-        <Level name="day_week" visible="true" column="DAY_WEEK" type="Integer" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day of Week">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="hm" visible="true" hasAll="true" caption="Hour Minute">
-        <Level name="hour_alltime" visible="true" column="HOUR_ALLTIME" type="Integer" uniqueMembers="false" levelType="TimeHours" hideMemberIf="Never" caption="Hour Alltime">
-        </Level>
-        <Level name="minute_hour" visible="true" column="MINUTE_HOUR" type="Integer" uniqueMembers="false" levelType="TimeMinutes" hideMemberIf="Never" caption="Minute Hour">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="date" visible="true" hasAll="true" caption="Date">
-        <Level name="date" visible="true" column="start_date" type="Date" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Date">
-          <KeyExpression>
-            <SQL dialect="generic">
-              <![CDATA[date(start_date)]]>
-            </SQL>
-          </KeyExpression>
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="dm" visible="true" hasAll="true" caption="Day Month">
-        <Level name="dm" visible="true" column="DAY_MONTH" type="Integer" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day">
-        </Level>
-      </Hierarchy>
-      <Hierarchy name="dw" visible="true" hasAll="true" caption="Day Week">
-        <Level name="dw" visible="true" column="DAY_WEEK" type="Integer" uniqueMembers="false" levelType="TimeDays" hideMemberIf="Never" caption="Day Week">
-        </Level>
-      </Hierarchy>
-    </Dimension>
-    <Measure name="dcount_ip_addr" column="IP_ADDR" datatype="Integer" aggregator="distinct-count" caption="IPs" visible="true">
+    <DimensionUsage source="user" name="user_dim" caption="User" visible="true" foreignKey="host_id" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="date" name="date_dim" caption="Date" visible="true" foreignKey="date_key" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="session" name="session_dim" caption="Session" visible="true" foreignKey="session_id" highCardinality="false">
+    </DimensionUsage>
+    <Measure name="dcount_host_id" column="host_id" datatype="Integer" aggregator="distinct-count" caption="Hosts" visible="true">
     </Measure>
-    <Measure name="bw_bytes" column="BYTES" datatype="Numeric" aggregator="sum" caption="Bytes" visible="true">
+    <Measure name="dl_bytes" column="download_bytes" datatype="Numeric" aggregator="sum" caption="Download Bytes" visible="true">
     </Measure>
+    <Measure name="ul_bytes" column="upload_bytes" aggregator="sum" caption="Upload Bytes" visible="true">
+    </Measure>
+    <Measure name="sum_total_bytes" column="total_bytes" aggregator="sum" caption="Total Bytes" visible="true">
+    </Measure>
+    <Measure name="avg_total_bytes" column="total_bytes" aggregator="avg" caption="Total Bytes Avg" visible="true">
+    </Measure>
+    <Measure name="max_total_bytes" column="total_bytes" aggregator="max" caption="Total Bytes Max" visible="true">
+    </Measure>
+    <Measure name="dcount_date_key" column="date_key" datatype="Integer" aggregator="distinct-count" caption="Seconds" visible="true">
+    </Measure>
+    <Measure name="dcount_session_id" column="session_id" datatype="Integer" aggregator="distinct-count" caption="Sessions" visible="true">
+    </Measure>
+    <CalculatedMember name="cm_sum_total_mb" caption="Total MB" formula="(Measures.sum_total_bytes/1000000)" dimension="Measures" visible="true">
+    </CalculatedMember>
+    <CalculatedMember name="cm_sum_dl_mb" caption="Download MB" formula="(Measures.dl_bytes/1000000)" dimension="Measures" visible="true">
+    </CalculatedMember>
+    <CalculatedMember name="cm_sum_ul_mb" caption="Upload MB" formula="(Measures.ul_bytes/1000000)" dimension="Measures" visible="true">
+    </CalculatedMember>
+  </Cube>
+  <Cube name="session" caption="Sessions" visible="true" cache="true" enabled="true">
+    <Table name="f_session" schema="public">
+    </Table>
+    <DimensionUsage source="session" name="session_dim" caption="Session" visible="true" foreignKey="session_id" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="date" name="date_dim" caption="Start Date" visible="true" foreignKey="session_start_date_key" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="user" name="user_dim" caption="User" visible="true" foreignKey="host_id" highCardinality="false">
+    </DimensionUsage>
+    <Measure name="dcount_session_id" column="session_id" datatype="Integer" formatString="0" aggregator="distinct-count" caption="Sessions" visible="true">
+    </Measure>
+    <Measure name="dcount_host_id" column="host_id" datatype="Integer" formatString="0" aggregator="distinct-count" caption="Hosts" visible="true">
+    </Measure>
+    <Measure name="sum_session_total_mbytes" column="session_total_mbytes" datatype="Numeric" aggregator="sum" caption="Total MBytes" visible="true">
+    </Measure>
+    <Measure name="avg_session_total_mbytes" column="session_total_mbytes" datatype="Numeric" aggregator="avg" caption="Avg MBytes" visible="true">
+    </Measure>
+    <Measure name="sum_session_duration" column="session_duration" datatype="Numeric" aggregator="sum" caption="Duration" visible="true">
+    </Measure>
+    <Measure name="avg_session_duration" column="session_duration" datatype="Numeric" aggregator="avg" caption="Duration Avg" visible="true">
+    </Measure>
+    <Measure name="dcount_date_key" column="session_start_date_key" datatype="Integer" aggregator="distinct-count" caption="Dates" visible="true">
+    </Measure>
+    <CalculatedMember name="cm_avg_sum_session_total_mbytes_week" caption="Daily Rate" formula="Avg([ns_past_week], Measures.sum_session_total_mbytes)" dimension="Measures" visible="true">
+    </CalculatedMember>
+    <CalculatedMember name="cm_avg_sum_session_total_mbytes_day" formatString="" caption="Hourly Rate" formula="Avg([ns_past_day], Measures.sum_session_total_mbytes)" dimension="Measures" visible="true">
+    </CalculatedMember>
+    <NamedSet name="ns_past_week" formula="">
+      <Formula>
+        <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(7):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
+      </Formula>
+    </NamedSet>
+    <NamedSet name="ns_past_month" formula="">
+      <Formula>
+        <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(30):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
+      </Formula>
+    </NamedSet>
+    <NamedSet name="ns_past_quarter" formula="">
+      <Formula>
+        <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(120):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
+      </Formula>
+    </NamedSet>
+    <NamedSet name="ns_past_year" formula="">
+      <Formula>
+        <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(365):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
+      </Formula>
+    </NamedSet>
+    <NamedSet name="ns_past_day" formula="">
+      <Formula>
+        <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE).lag(24):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE)]]>
+      </Formula>
+    </NamedSet>
   </Cube>
 </Schema>
