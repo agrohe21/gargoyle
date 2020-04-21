@@ -675,7 +675,7 @@
         <currency/>
         <decimal/>
         <group/>
-        <nullif>hosts-.*|quota-.*|bw-.*|web-.*</nullif>
+        <nullif>conn-.*|hosts-.*|quota-.*|bw-.*|web-.*</nullif>
         <length>50</length>
         <precision>-1</precision>
         <set_empty_string>N</set_empty_string>

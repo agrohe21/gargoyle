@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>files_archive_complete</name>
+    <name>test_wan_domain</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -427,73 +427,210 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2020/03/19 09:19:28.807</created_date>
+    <created_date>2020/04/17 09:14:06.937</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2020/03/19 09:19:28.807</modified_date>
-    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
+    <modified_date>2020/04/17 09:14:06.937</modified_date>
+    <key_for_session_key/>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
+  <connection>
+    <name>gargoyle_bwmon</name>
+    <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${GARGOYLE_BWMON_DATABASE}</database>
+    <port>5432</port>
+    <username>${GARGOYLE_BWMON_USER}</username>
+    <password>${GARGOYLE_BWMON_PASS}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>5432</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
   <order>
     <hop>
-      <from>post-start</from>
-      <to>ac:file-patterns</to>
+      <from>ac:commands</from>
+      <to>ep:wan-lookup</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>ac:file-patterns</from>
-      <to>gfn:files</to>
+      <from>ep:wan-lookup</from>
+      <to>sv:remove-process-fields</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>gen row</from>
-      <to>sys date</to>
+      <from>ti:web-domains</from>
+      <to>dbl:wan_host</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>sys date</from>
-      <to>post-start</to>
+      <from>dbl:wan_host</from>
+      <to>fr:wan-host</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>gfn:files</from>
-      <to>js:calc-date-string</to>
+      <from>fr:wan-host</from>
+      <to>found</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>c:date-diff</from>
-      <to>fr:file-age</to>
+      <from>fr:wan-host</from>
+      <to>not-found</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>fr:file-age</from>
-      <to>recent</to>
+      <from>sv:remove-process-fields</from>
+      <to>fr:wan-ip</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>fr:file-age</from>
-      <to>older</to>
+      <from>fr:wan-ip</from>
+      <to>found-wan-ip</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>older</from>
-      <to>zf:archive-old files</to>
+      <from>fr:wan-ip</from>
+      <to>not-found-wan-ip</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>js:calc-date-string</from>
-      <to>sr:file_string</to>
+      <from>not-found</from>
+      <to>sv:missed-lookups</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>sr:file_string</from>
-      <to>c:date-diff</to>
+      <from>sv:missed-lookups</from>
+      <to>ac:commands</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>ac:file-patterns</name>
+    <name>ti:web-domains</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>gargoyle_bwmon</connection>
+    <sql>SELECT domain, count(*)
+  FROM public.f_webmon t1
+GROUP BY
+domain
+having count(*) > 100
+order by 2 desc</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <cached_row_meta_active>N</cached_row_meta_active>
+    <row-meta>
+      <value-meta>
+        <type>String</type>
+        <storagetype>normal</storagetype>
+        <name>domain</name>
+        <length>256</length>
+        <precision>-1</precision>
+        <origin>Table input</origin>
+        <comments>domain</comments>
+        <conversion_Mask/>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_US</date_format_locale>
+        <date_format_timezone>America/Chicago</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+      <value-meta>
+        <type>Integer</type>
+        <storagetype>normal</storagetype>
+        <name>count</name>
+        <length>15</length>
+        <precision>0</precision>
+        <origin>Table input</origin>
+        <comments>count</comments>
+        <conversion_Mask>####0;-####0</conversion_Mask>
+        <decimal_symbol>.</decimal_symbol>
+        <grouping_symbol>,</grouping_symbol>
+        <currency_symbol/>
+        <trim_type>none</trim_type>
+        <case_insensitive>N</case_insensitive>
+        <collator_disabled>Y</collator_disabled>
+        <collator_strength>0</collator_strength>
+        <sort_descending>N</sort_descending>
+        <output_padding>N</output_padding>
+        <date_format_lenient>N</date_format_lenient>
+        <date_format_locale>en_US</date_format_locale>
+        <date_format_timezone>America/Chicago</date_format_timezone>
+        <lenient_string_to_number>N</lenient_string_to_number>
+      </value-meta>
+    </row-meta>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>96</xloc>
+      <yloc>128</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ac:commands</name>
     <type>Constant</type>
     <description/>
     <distribute>Y</distribute>
@@ -505,26 +642,14 @@
     </partitioning>
     <fields>
       <field>
-        <name>file_directory</name>
+        <name>command</name>
         <type>String</type>
         <format/>
         <currency/>
         <decimal/>
         <group/>
-        <nullif>${PROJECT_INPUT}/complete</nullif>
-        <length>256</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-      <field>
-        <name>file_pattern</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>mon_conn-.*|mon_hosts-.*|mon_quota-.*|mon_bw-.*|mon_web-.*</nullif>
-        <length>50</length>
+        <nullif>/home/agrohe21/projects/gargoyle/scripts/get_revnslookup.sh</nullif>
+        <length>25</length>
         <precision>-1</precision>
         <set_empty_string>N</set_empty_string>
       </field>
@@ -538,38 +663,34 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>420</xloc>
-      <yloc>300</yloc>
+      <xloc>528</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>c:date-diff</name>
-    <type>Calculator</type>
+    <name>ep:wan-lookup</name>
+    <type>ExecProcess</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
-    <copies>1</copies>
+    <copies>8</copies>
     <partitioning>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <failIfNoFile>Y</failIfNoFile>
-    <calculation>
-      <field_name>file_age_days</field_name>
-      <calc_type>DATE_DIFF</calc_type>
-      <field_a>current_time</field_a>
-      <field_b>lastmodifiedtime</field_b>
-      <field_c/>
-      <value_type>None</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
+    <processfield>command</processfield>
+    <resultfieldname>stdOut</resultfieldname>
+    <errorfieldname>stdErr</errorfieldname>
+    <exitvaluefieldname>proc_exit</exitvaluefieldname>
+    <failwhennotsuccess>N</failwhennotsuccess>
+    <outputlinedelimiter>\n</outputlinedelimiter>
+    <argumentsInFields>Y</argumentsInFields>
+    <argumentFields>
+      <argumentField>
+        <argumentFieldName>domain</argumentFieldName>
+      </argumentField>
+    </argumentFields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -579,13 +700,119 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>840</xloc>
-      <yloc>300</yloc>
+      <xloc>640</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>fr:file-age</name>
+    <name>sv:remove-process-fields</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>domain</name>
+        <rename/>
+      </field>
+      <field>
+        <name>stdOut</name>
+        <rename>wan_ip</rename>
+      </field>
+      <field>
+        <name>proc_exit</name>
+        <rename/>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>784</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>dbl:wan_host</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>gargoyle_bwmon</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_wan_host</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>domain</name>
+        <field>fqdn</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>wan_host_id</name>
+        <rename>wan_host_id</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+      <value>
+        <name>wan_ip</name>
+        <rename>wan_ip</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>fqdn</name>
+        <rename>fqdn</rename>
+        <default/>
+        <type>String</type>
+      </value>
+      <value>
+        <name>date_modified</name>
+        <rename>date_modified</rename>
+        <default/>
+        <type>Timestamp</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>208</xloc>
+      <yloc>128</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>fr:wan-host</name>
     <type>FilterRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -595,23 +822,14 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <send_true_to>recent</send_true_to>
-    <send_false_to>older</send_false_to>
+    <send_true_to>found</send_true_to>
+    <send_false_to>not-found</send_false_to>
     <compare>
       <condition>
         <negated>N</negated>
-        <leftvalue>file_age_days</leftvalue>
-        <function>=</function>
+        <leftvalue>wan_host_id</leftvalue>
+        <function>IS NOT NULL</function>
         <rightvalue/>
-        <value>
-          <name>constant</name>
-          <type>Integer</type>
-          <text>0</text>
-          <length>-1</length>
-          <precision>0</precision>
-          <isnull>N</isnull>
-          <mask>####0;-####0</mask>
-        </value>
       </condition>
     </compare>
     <attributes/>
@@ -623,150 +841,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>930</xloc>
-      <yloc>300</yloc>
+      <xloc>320</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>gen row</name>
-    <type>RowGenerator</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-    </fields>
-    <limit>1</limit>
-    <never_ending>N</never_ending>
-    <interval_in_ms>${INTERVAL}</interval_in_ms>
-    <row_time_field>current_time</row_time_field>
-    <last_time_field>prior_time</last_time_field>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>60</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>gfn:files</name>
-    <type>GetFileNames</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <filter>
-      <filterfiletype>all_files</filterfiletype>
-    </filter>
-    <doNotFailIfNoFile>N</doNotFailIfNoFile>
-    <rownum>N</rownum>
-    <isaddresult>N</isaddresult>
-    <filefield>Y</filefield>
-    <rownum_field/>
-    <filename_Field>file_directory</filename_Field>
-    <wildcard_Field>file_pattern</wildcard_Field>
-    <exclude_wildcard_Field/>
-    <dynamic_include_subfolders>N</dynamic_include_subfolders>
-    <limit>0</limit>
-    <file>
-      <name>${PROJECT_INPUT}/gargoyle_nfs</name>
-      <filemask>hosts-.*|quota-.*|bw-.*|web-.*</filemask>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>510</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>js:calc-date-string</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-
-var file_array=short_filename.split("-");
-file_array.shift(); //remove first part with string. leave date
-file_array.pop();   //remove seconds
-file_array.pop();   //remove minutes
-file_array.pop();   //remove hours
-var file_string = file_array.join("-");
-var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + "/complete/mon_gargoyle-" + file_string + ".zip";</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>file_string</name>
-        <rename>file_string</rename>
-        <type>String</type>
-        <length>25</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>target_string</name>
-        <rename>target_string</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>630</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>older</name>
+    <name>not-found</name>
     <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
@@ -785,13 +866,13 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>1020</xloc>
-      <yloc>300</yloc>
+      <xloc>320</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>post-start</name>
+    <name>found</name>
     <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
@@ -810,13 +891,69 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>300</xloc>
-      <yloc>300</yloc>
+      <xloc>432</xloc>
+      <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>recent</name>
+    <name>fr:wan-ip</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>found-wan-ip</send_true_to>
+    <send_false_to>not-found-wan-ip</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>wan_ip</leftvalue>
+            <function>IS NOT NULL</function>
+            <rightvalue/>
+          </condition>
+          <condition>
+            <negated>N</negated>
+            <operator>AND</operator>
+            <leftvalue>proc_exit</leftvalue>
+            <function>=</function>
+            <rightvalue/>
+            <value>
+              <name>constant</name>
+              <type>Integer</type>
+              <text>0</text>
+              <length>-1</length>
+              <precision>0</precision>
+              <isnull>N</isnull>
+              <mask>####0;-####0</mask>
+            </value>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>912</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>not-found-wan-ip</name>
     <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
@@ -835,14 +972,14 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>930</xloc>
-      <yloc>360</yloc>
+      <xloc>912</xloc>
+      <yloc>336</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>sr:file_string</name>
-    <type>SortRows</type>
+    <name>found-wan-ip</name>
+    <type>Dummy</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -851,22 +988,45 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <directory>%%java.io.tmpdir%%</directory>
-    <prefix>out</prefix>
-    <sort_size>1000000</sort_size>
-    <free_memory/>
-    <compress>N</compress>
-    <compress_variable/>
-    <unique_rows>N</unique_rows>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1024</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sv:missed-lookups</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
     <fields>
-      <field>
-        <name>file_string</name>
-        <ascending>Y</ascending>
-        <case_sensitive>N</case_sensitive>
-        <collator_enabled>N</collator_enabled>
-        <collator_strength>0</collator_strength>
-        <presorted>N</presorted>
-      </field>
+      <select_unspecified>N</select_unspecified>
+      <remove>
+        <name>wan_host_id</name>
+      </remove>
+      <remove>
+        <name>wan_ip</name>
+      </remove>
+      <remove>
+        <name>fqdn</name>
+      </remove>
+      <remove>
+        <name>date_modified</name>
+      </remove>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -877,77 +1037,8 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>750</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>sys date</name>
-    <type>SystemInfo</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-      <field>
-        <name>current_time</name>
-        <type>system date (fixed)</type>
-      </field>
-      <field>
-        <name>prior_time</name>
-        <type>system date (variable)</type>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>180</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>zf:archive-old files</name>
-    <type>ZipFile</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <sourcefilenamefield>filename</sourcefilenamefield>
-    <targetfilenamefield>target_string</targetfilenamefield>
-    <baseFolderField/>
-    <operation_type>delete</operation_type>
-    <addresultfilenames>N</addresultfilenames>
-    <overwritezipentry>N</overwritezipentry>
-    <createparentfolder>N</createparentfolder>
-    <keepsourcefolder>N</keepsourcefolder>
-    <movetofolderfield/>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1170</xloc>
-      <yloc>300</yloc>
+      <xloc>416</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

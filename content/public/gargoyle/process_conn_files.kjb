@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job>
-  <name>process_files</name>
+  <name>process_conn_files</name>
   <description/>
   <extended_description/>
   <job_version/>
   <job_status>0</job_status>
   <directory>/</directory>
   <created_user>-</created_user>
-  <created_date>2020/03/17 09:57:53.588</created_date>
+  <created_date>2020/03/16 16:24:22.671</created_date>
   <modified_user>-</modified_user>
-  <modified_date>2020/03/17 09:57:53.588</modified_date>
+  <modified_date>2020/03/16 16:24:22.671</modified_date>
   <parameters>
     <parameter>
       <name>file_date</name>
-      <default_value>2020-03-16-16-30-35</default_value>
+      <default_value>2020-04-15-10-10-22</default_value>
       <description/>
     </parameter>
   </parameters>
@@ -310,280 +310,248 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>90</xloc>
-      <yloc>144</yloc>
+      <xloc>60</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>wtl:files</name>
+      <name>cf:processing</name>
       <description/>
-      <type>WRITE_TO_LOG</type>
+      <type>COPY_FILES</type>
       <attributes/>
-      <logmessage>Processing Files KJB:</logmessage>
-      <loglevel>Basic</loglevel>
-      <logsubject>${file_date}</logsubject>
+      <copy_empty_folders>N</copy_empty_folders>
+      <arg_from_previous>N</arg_from_previous>
+      <overwrite_files>Y</overwrite_files>
+      <include_subfolders>N</include_subfolders>
+      <remove_source_files>Y</remove_source_files>
+      <add_result_filesname>Y</add_result_filesname>
+      <destination_is_a_file>N</destination_is_a_file>
+      <create_destination_folder>N</create_destination_folder>
+      <fields>
+        <field>
+          <source_filefolder>EMPTY_SOURCE_URL-0-${PROJECT_INPUT}/gargoyle_nfs</source_filefolder>
+          <source_configuration_name>LOCAL-SOURCE-FILE-0</source_configuration_name>
+          <destination_filefolder>EMPTY_DEST_URL-0-${PROJECT_INPUT}/processing</destination_filefolder>
+          <destination_configuration_name>LOCAL-DEST-FILE-0</destination_configuration_name>
+          <wildcard>conn-.*${file_date}</wildcard>
+        </field>
+      </fields>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>330</xloc>
+      <yloc>150</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>efm:files-not-processed</name>
+      <description/>
+      <type>EVAL_FILES_METRICS</type>
+      <attributes/>
+      <result_filenames_wildcard/>
+      <Result_field_file/>
+      <Result_field_wildcard/>
+      <Result_field_includesubfolders/>
+      <fields>
+        <field>
+          <source_filefolder>${PROJECT_INPUT}/gargoyle_nfs</source_filefolder>
+          <wildcard>conn-.*${file_date}</wildcard>
+          <include_subFolders>N</include_subFolders>
+        </field>
+      </fields>
+      <comparevalue>2</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successnumbercondition>equal</successnumbercondition>
+      <source_files>files</source_files>
+      <evaluation_type>count</evaluation_type>
+      <scale>bytes</scale>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>180</xloc>
-      <yloc>144</yloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>j:hosts</name>
+      <name>t:connections</name>
       <description/>
-      <type>JOB</type>
+      <type>TRANS</type>
       <attributes/>
       <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/process_host_files.kjb</filename>
-      <jobname/>
-      <directory/>
+      <trans_object_id/>
+      <filename>${PROJECT_CONTENT}/public/gargoyle/fact_connection.ktr</filename>
+      <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
       <logfile/>
       <logext/>
       <add_date>N</add_date>
       <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
       <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
       <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
+      <logging_remote_work>N</logging_remote_work>
       <run_configuration/>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>file_date</name>
-          <stream_name>file_date</stream_name>
-          <value/>
+          <stream_name/>
+          <value>${file_date}</value>
         </parameter>
       </parameters>
-      <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>270</xloc>
-      <yloc>144</yloc>
+      <xloc>690</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>j:quota</name>
+      <name>zf:complete</name>
       <description/>
-      <type>JOB</type>
+      <type>ZIP_FILE</type>
       <attributes/>
-      <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/process_quota_files.kjb</filename>
-      <jobname/>
-      <directory/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <slave_server_name/>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
-      <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
-      <run_configuration/>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-        <parameter>
-          <name>file_date</name>
-          <stream_name>file_date</stream_name>
-          <value/>
-        </parameter>
-      </parameters>
-      <set_append_logfile>N</set_append_logfile>
+      <zipfilename>${PROJECT_INPUT}/complete/mon_conn-${file_date}.zip</zipfilename>
+      <compressionrate>1</compressionrate>
+      <ifzipfileexists>1</ifzipfileexists>
+      <wildcard>conn-.*${file_date}</wildcard>
+      <wildcardexclude/>
+      <sourcedirectory>${PROJECT_INPUT}/processing</sourcedirectory>
+      <movetodirectory/>
+      <afterzip>1</afterzip>
+      <addfiletoresult>Y</addfiletoresult>
+      <isfromprevious>N</isfromprevious>
+      <createparentfolder>N</createparentfolder>
+      <adddate>N</adddate>
+      <addtime>N</addtime>
+      <SpecifyFormat>N</SpecifyFormat>
+      <date_time_format>yyyy-MM-dd-HH-mm-ss</date_time_format>
+      <createMoveToDirectory>N</createMoveToDirectory>
+      <include_subfolders>N</include_subfolders>
+      <stored_source_path_depth>1</stored_source_path_depth>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>360</xloc>
-      <yloc>144</yloc>
+      <xloc>840</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>j:bandwidth</name>
+      <name>efm:files-in-process</name>
       <description/>
-      <type>JOB</type>
+      <type>EVAL_FILES_METRICS</type>
       <attributes/>
-      <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/process_bw_files.kjb</filename>
-      <jobname/>
-      <directory/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <slave_server_name/>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
-      <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
-      <run_configuration/>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-        <parameter>
-          <name>file_date</name>
-          <stream_name>file_date</stream_name>
-          <value/>
-        </parameter>
-      </parameters>
-      <set_append_logfile>N</set_append_logfile>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>540</xloc>
-      <yloc>144</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>j:web</name>
-      <description/>
-      <type>JOB</type>
-      <attributes/>
-      <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/process_web_files.kjb</filename>
-      <jobname/>
-      <directory/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
-      <slave_server_name/>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
-      <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
-      <run_configuration/>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-        <parameter>
-          <name>file_date</name>
-          <stream_name>file_date</stream_name>
-          <value/>
-        </parameter>
-      </parameters>
-      <set_append_logfile>N</set_append_logfile>
+      <result_filenames_wildcard/>
+      <Result_field_file/>
+      <Result_field_wildcard/>
+      <Result_field_includesubfolders/>
+      <fields>
+        <field>
+          <source_filefolder>${PROJECT_INPUT}/processing</source_filefolder>
+          <wildcard>conn-.*${file_date}</wildcard>
+          <include_subFolders>N</include_subFolders>
+        </field>
+      </fields>
+      <comparevalue>2</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successnumbercondition>equal</successnumbercondition>
+      <source_files>files</source_files>
+      <evaluation_type>count</evaluation_type>
+      <scale>bytes</scale>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>450</xloc>
-      <yloc>144</yloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>j:session-creator</name>
-      <description/>
-      <type>TRANS</type>
-      <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/session_creator_runner.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration/>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>640</xloc>
-      <yloc>144</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>j:session-bandwidth</name>
-      <description/>
-      <type>TRANS</type>
-      <attributes/>
-      <specification_method>filename</specification_method>
-      <trans_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/session_bandwidth_runner.ktr</filename>
-      <transname/>
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile/>
-      <logext/>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name/>
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration/>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>768</xloc>
-      <yloc>144</yloc>
-      <attributes_kjc/>
-    </entry>
-    <entry>
-      <name>abort process_files</name>
+      <name>Abort job conn processing</name>
       <description/>
       <type>ABORT</type>
       <attributes/>
-      <message>${file_date}</message>
+      <message>Conn files not in processing folder:${file_date}</message>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>544</xloc>
-      <yloc>336</yloc>
+      <xloc>450</xloc>
+      <yloc>270</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>processing</name>
+      <description/>
+      <type>SPECIAL</type>
+      <attributes/>
+      <start>N</start>
+      <dummy>Y</dummy>
+      <repeat>N</repeat>
+      <schedulerType>0</schedulerType>
+      <intervalSeconds>0</intervalSeconds>
+      <intervalMinutes>60</intervalMinutes>
+      <hour>12</hour>
+      <minutes>0</minutes>
+      <weekDay>1</weekDay>
+      <DayOfMonth>1</DayOfMonth>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>570</xloc>
+      <yloc>150</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>Abort job conn input</name>
+      <description/>
+      <type>ABORT</type>
+      <attributes/>
+      <message>No conn files in input folder:${file_date}</message>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>180</xloc>
+      <yloc>270</yloc>
+      <attributes_kjc/>
+    </entry>
+    <entry>
+      <name>efm:files-not-in-process</name>
+      <description/>
+      <type>EVAL_FILES_METRICS</type>
+      <attributes/>
+      <result_filenames_wildcard/>
+      <Result_field_file/>
+      <Result_field_wildcard/>
+      <Result_field_includesubfolders/>
+      <fields>
+        <field>
+          <source_filefolder>${PROJECT_INPUT}/processing</source_filefolder>
+          <wildcard>conn-.*${file_date}</wildcard>
+          <include_subFolders>N</include_subFolders>
+        </field>
+      </fields>
+      <comparevalue>0</comparevalue>
+      <minvalue/>
+      <maxvalue/>
+      <successnumbercondition>equal</successnumbercondition>
+      <source_files>files</source_files>
+      <evaluation_type>count</evaluation_type>
+      <scale>bytes</scale>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>960</xloc>
+      <yloc>150</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -595,56 +563,66 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>960</xloc>
-      <yloc>144</yloc>
+      <yloc>272</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
-      <name>j:connections</name>
+      <name>t:stg-connections</name>
       <description/>
-      <type>JOB</type>
+      <type>TRANS</type>
       <attributes/>
       <specification_method>filename</specification_method>
-      <job_object_id/>
-      <filename>${PROJECT_CONTENT}/public/gargoyle/process_conn_files.kjb</filename>
-      <jobname/>
-      <directory/>
+      <trans_object_id/>
+      <filename>${PROJECT_CONTENT}/public/gargoyle/process_stg_conn.ktr</filename>
+      <transname/>
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
       <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
       <set_logfile>N</set_logfile>
       <logfile/>
       <logext/>
       <add_date>N</add_date>
       <add_time>N</add_time>
-      <loglevel>Nothing</loglevel>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
       <slave_server_name/>
+      <set_append_logfile>N</set_append_logfile>
       <wait_until_finished>Y</wait_until_finished>
       <follow_abort_remote>N</follow_abort_remote>
-      <expand_remote_job>N</expand_remote_job>
       <create_parent_folder>N</create_parent_folder>
-      <pass_export>N</pass_export>
+      <logging_remote_work>N</logging_remote_work>
       <run_configuration/>
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
           <name>file_date</name>
-          <stream_name>file_date</stream_name>
-          <value/>
+          <stream_name/>
+          <value>${file_date}</value>
         </parameter>
       </parameters>
-      <set_append_logfile>N</set_append_logfile>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>880</xloc>
+      <xloc>1088</xloc>
       <yloc>144</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
   <hops>
     <hop>
+      <from>efm:files-not-processed</from>
+      <to>cf:processing</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
       <from>Start</from>
-      <to>wtl:files</to>
+      <to>efm:files-not-processed</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -652,17 +630,62 @@
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>wtl:files</from>
-      <to>j:hosts</to>
+      <from>t:connections</from>
+      <to>zf:complete</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>cf:processing</from>
+      <to>efm:files-in-process</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>efm:files-in-process</from>
+      <to>Abort job conn processing</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>N</enabled>
       <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>efm:files-in-process</from>
+      <to>processing</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>processing</from>
+      <to>t:connections</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>j:bandwidth</from>
-      <to>j:session-creator</to>
+      <from>efm:files-not-processed</from>
+      <to>Abort job conn input</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>N</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>zf:complete</from>
+      <to>efm:files-not-in-process</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -670,8 +693,17 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>j:session-creator</from>
-      <to>j:session-bandwidth</to>
+      <from>efm:files-not-processed</from>
+      <to>Success</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>efm:files-not-in-process</from>
+      <to>t:stg-connections</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -679,111 +711,12 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>j:quota</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:hosts</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:web</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:bandwidth</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:session-creator</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:session-bandwidth</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:hosts</from>
-      <to>j:quota</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:quota</from>
-      <to>j:web</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:web</from>
-      <to>j:bandwidth</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:session-bandwidth</from>
-      <to>j:connections</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:connections</from>
+      <from>t:stg-connections</from>
       <to>Success</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>j:connections</from>
-      <to>abort process_files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>

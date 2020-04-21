@@ -423,7 +423,7 @@
       <attributes/>
       <zipfilename>${PROJECT_INPUT}/complete/mon_bw-${file_date}.zip</zipfilename>
       <compressionrate>1</compressionrate>
-      <ifzipfileexists>2</ifzipfileexists>
+      <ifzipfileexists>1</ifzipfileexists>
       <wildcard>bw-.*${file_date}</wildcard>
       <wildcardexclude/>
       <sourcedirectory>${PROJECT_INPUT}/processing</sourcedirectory>

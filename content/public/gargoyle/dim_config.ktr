@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>files_archive_complete</name>
+    <name>dim_config</name>
     <description/>
     <extended_description/>
     <trans_version/>
     <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
+      <parameter>
+        <name>file_date</name>
+        <default_value>2020-04-20-09-04-30</default_value>
+        <description/>
+      </parameter>
     </parameters>
     <log>
       <trans-log-table>
@@ -407,12 +413,12 @@
       <offset>0.0</offset>
       <maxdiff>0.0</maxdiff>
     </maxdate>
-    <size_rowset>10000</size_rowset>
+    <size_rowset>1000</size_rowset>
     <sleep_time_empty>50</sleep_time_empty>
     <sleep_time_full>50</sleep_time_full>
     <unique_connections>N</unique_connections>
     <feedback_shown>Y</feedback_shown>
-    <feedback_size>50000</feedback_size>
+    <feedback_size>1000</feedback_size>
     <using_thread_priorities>Y</using_thread_priorities>
     <shared_objects_file/>
     <capture_step_performance>N</capture_step_performance>
@@ -427,74 +433,85 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2020/03/19 09:19:28.807</created_date>
+    <created_date>2017/09/11 15:21:24.884</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2020/03/19 09:19:28.807</modified_date>
+    <modified_date>2017/09/11 15:21:24.884</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
+  <connection>
+    <name>gargoyle_bwmon</name>
+    <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
+    <type>POSTGRESQL</type>
+    <access>Native</access>
+    <database>${GARGOYLE_BWMON_DATABASE}</database>
+    <port>5432</port>
+    <username>${GARGOYLE_BWMON_USER}</username>
+    <password>${GARGOYLE_BWMON_PASS}</password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>5432</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
   <order>
     <hop>
-      <from>post-start</from>
-      <to>ac:file-patterns</to>
+      <from>pi:wan-config</from>
+      <to>sr:key</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>ac:file-patterns</from>
-      <to>gfn:files</to>
+      <from>sr:key</from>
+      <to>rd:configuraitons</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>gen row</from>
-      <to>sys date</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>sys date</from>
-      <to>post-start</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>gfn:files</from>
-      <to>js:calc-date-string</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>c:date-diff</from>
-      <to>fr:file-age</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>fr:file-age</from>
-      <to>recent</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>fr:file-age</from>
-      <to>older</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>older</from>
-      <to>zf:archive-old files</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>js:calc-date-string</from>
-      <to>sr:file_string</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>sr:file_string</from>
-      <to>c:date-diff</to>
+      <from>rd:configuraitons</from>
+      <to>iu:dim_wan</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>ac:file-patterns</name>
-    <type>Constant</type>
+    <name>pi:wan-config</name>
+    <type>PropertyInput</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -503,194 +520,64 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <fields>
-      <field>
-        <name>file_directory</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>${PROJECT_INPUT}/complete</nullif>
-        <length>256</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-      <field>
-        <name>file_pattern</name>
-        <type>String</type>
-        <format/>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif>mon_conn-.*|mon_hosts-.*|mon_quota-.*|mon_bw-.*|mon_web-.*</nullif>
-        <length>50</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>420</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>c:date-diff</name>
-    <type>Calculator</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <failIfNoFile>Y</failIfNoFile>
-    <calculation>
-      <field_name>file_age_days</field_name>
-      <calc_type>DATE_DIFF</calc_type>
-      <field_a>current_time</field_a>
-      <field_b>lastmodifiedtime</field_b>
-      <field_c/>
-      <value_type>None</value_type>
-      <value_length>-1</value_length>
-      <value_precision>-1</value_precision>
-      <remove>N</remove>
-      <conversion_mask/>
-      <decimal_symbol/>
-      <grouping_symbol/>
-      <currency_symbol/>
-    </calculation>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>840</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>fr:file-age</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <send_true_to>recent</send_true_to>
-    <send_false_to>older</send_false_to>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <leftvalue>file_age_days</leftvalue>
-        <function>=</function>
-        <rightvalue/>
-        <value>
-          <name>constant</name>
-          <type>Integer</type>
-          <text>0</text>
-          <length>-1</length>
-          <precision>0</precision>
-          <isnull>N</isnull>
-          <mask>####0;-####0</mask>
-        </value>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>930</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>gen row</name>
-    <type>RowGenerator</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <fields>
-    </fields>
-    <limit>1</limit>
-    <never_ending>N</never_ending>
-    <interval_in_ms>${INTERVAL}</interval_in_ms>
-    <row_time_field>current_time</row_time_field>
-    <last_time_field>prior_time</last_time_field>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>60</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>gfn:files</name>
-    <type>GetFileNames</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <filter>
-      <filterfiletype>all_files</filterfiletype>
-    </filter>
-    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <file_type>property</file_type>
+    <encoding>UTF-8</encoding>
+    <include>N</include>
+    <include_field/>
+    <filename_Field/>
     <rownum>N</rownum>
-    <isaddresult>N</isaddresult>
-    <filefield>Y</filefield>
+    <isaddresult>Y</isaddresult>
+    <filefield>N</filefield>
     <rownum_field/>
-    <filename_Field>file_directory</filename_Field>
-    <wildcard_Field>file_pattern</wildcard_Field>
-    <exclude_wildcard_Field/>
-    <dynamic_include_subfolders>N</dynamic_include_subfolders>
-    <limit>0</limit>
+    <resetrownumber>N</resetrownumber>
+    <resolvevaluevariable>N</resolvevaluevariable>
+    <ini_section>N</ini_section>
+    <ini_section_field/>
+    <section/>
     <file>
-      <name>${PROJECT_INPUT}/gargoyle_nfs</name>
-      <filemask>hosts-.*|quota-.*|bw-.*|web-.*</filemask>
+      <name>${PROJECT_INPUT}/processing</name>
       <exclude_filemask/>
+      <filemask>wan-config-${file_date}</filemask>
       <file_required>N</file_required>
       <include_subfolders>N</include_subfolders>
     </file>
+    <fields>
+      <field>
+        <name>Key</name>
+        <column>key</column>
+        <type>String</type>
+        <format/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <currency/>
+        <decimal/>
+        <group/>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>Value</name>
+        <column>value</column>
+        <type>String</type>
+        <format/>
+        <length>-1</length>
+        <precision>-1</precision>
+        <currency/>
+        <decimal/>
+        <group/>
+        <trim_type>both</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -700,14 +587,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>510</xloc>
-      <yloc>300</yloc>
+      <xloc>128</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>js:calc-date-string</name>
-    <type>ScriptValueMod</type>
+    <name>rd:configuraitons</name>
+    <type>Denormaliser</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -716,39 +603,93 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-
-var file_array=short_filename.split("-");
-file_array.shift(); //remove first part with string. leave date
-file_array.pop();   //remove seconds
-file_array.pop();   //remove minutes
-file_array.pop();   //remove hours
-var file_string = file_array.join("-");
-var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + "/complete/mon_gargoyle-" + file_string + ".zip";</jsScript_script>
-      </jsScript>
-    </jsScripts>
+    <key_field>Key</key_field>
+    <group>
+        </group>
     <fields>
       <field>
-        <name>file_string</name>
-        <rename>file_string</rename>
-        <type>String</type>
-        <length>25</length>
-        <precision>-1</precision>
-        <replace>N</replace>
+        <field_name>Value</field_name>
+        <key_value>network.lan.ifname</key_value>
+        <target_name>lan-ifname</target_name>
+        <target_type>String</target_type>
+        <target_format/>
+        <target_length>12</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
       </field>
       <field>
-        <name>target_string</name>
-        <rename>target_string</rename>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
+        <field_name>Value</field_name>
+        <key_value>network.lan.up</key_value>
+        <target_name>lan-up</target_name>
+        <target_type>Boolean</target_type>
+        <target_format/>
+        <target_length>-1</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>Value</field_name>
+        <key_value>network.wan.gateway</key_value>
+        <target_name>wan-gateway</target_name>
+        <target_type>String</target_type>
+        <target_format/>
+        <target_length>15</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>Value</field_name>
+        <key_value>network.wan.ipaddr</key_value>
+        <target_name>wan-ipaddr</target_name>
+        <target_type>String</target_type>
+        <target_format/>
+        <target_length>15</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>Value</field_name>
+        <key_value>network.wan.lease_hostname</key_value>
+        <target_name>wan-hostname</target_name>
+        <target_type>String</target_type>
+        <target_format/>
+        <target_length>25</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
+      </field>
+      <field>
+        <field_name>Value</field_name>
+        <key_value>network.wan.up</key_value>
+        <target_name>wan-up</target_name>
+        <target_type>Boolean</target_type>
+        <target_format/>
+        <target_length>-1</target_length>
+        <target_precision>-1</target_precision>
+        <target_decimal_symbol/>
+        <target_grouping_symbol/>
+        <target_currency_symbol/>
+        <target_null_string/>
+        <target_aggregation_type>-</target_aggregation_type>
       </field>
     </fields>
     <attributes/>
@@ -760,88 +701,13 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>630</xloc>
-      <yloc>300</yloc>
+      <xloc>400</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>older</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1020</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>post-start</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>300</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>recent</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>930</xloc>
-      <yloc>360</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>sr:file_string</name>
+    <name>sr:key</name>
     <type>SortRows</type>
     <description/>
     <distribute>Y</distribute>
@@ -860,7 +726,7 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
     <unique_rows>N</unique_rows>
     <fields>
       <field>
-        <name>file_string</name>
+        <name>Key</name>
         <ascending>Y</ascending>
         <case_sensitive>N</case_sensitive>
         <collator_enabled>N</collator_enabled>
@@ -877,14 +743,14 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>750</xloc>
-      <yloc>300</yloc>
+      <xloc>272</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>sys date</name>
-    <type>SystemInfo</type>
+    <name>iu:dim_wan</name>
+    <type>InsertUpdate</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -893,16 +759,49 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <fields>
-      <field>
-        <name>current_time</name>
-        <type>system date (fixed)</type>
-      </field>
-      <field>
-        <name>prior_time</name>
-        <type>system date (variable)</type>
-      </field>
-    </fields>
+    <connection>gargoyle_bwmon</connection>
+    <commit>1</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema>public</schema>
+      <table>dim_wan</table>
+      <key>
+        <name>wan-hostname</name>
+        <field>wan-hostname</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>lan-ifname</name>
+        <rename>lan-ifname</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>lan-up</name>
+        <rename>lan-up</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>wan-gateway</name>
+        <rename>wan-gateway</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>wan-ipaddr</name>
+        <rename>wan-ipaddr</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>wan-hostname</name>
+        <rename>wan-hostname</rename>
+        <update>N</update>
+      </value>
+      <value>
+        <name>wan-up</name>
+        <rename>wan-up</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -912,42 +811,8 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
       </output>
     </remotesteps>
     <GUI>
-      <xloc>180</xloc>
-      <yloc>300</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>zf:archive-old files</name>
-    <type>ZipFile</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <sourcefilenamefield>filename</sourcefilenamefield>
-    <targetfilenamefield>target_string</targetfilenamefield>
-    <baseFolderField/>
-    <operation_type>delete</operation_type>
-    <addresultfilenames>N</addresultfilenames>
-    <overwritezipentry>N</overwritezipentry>
-    <createparentfolder>N</createparentfolder>
-    <keepsourcefolder>N</keepsourcefolder>
-    <movetofolderfield/>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>1170</xloc>
-      <yloc>300</yloc>
+      <xloc>600</xloc>
+      <yloc>240</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -956,5 +821,9 @@ var target_string = getVariable("PROJECT_INPUT", "~/projects/gargoyle/input") + 
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
-  <attributes/>
+  <attributes>
+    <group>
+      <name>explorerState</name>
+    </group>
+  </attributes>
 </transformation>
