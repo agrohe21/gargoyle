@@ -523,8 +523,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>510</xloc>
-      <yloc>180</yloc>
+      <xloc>496</xloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -561,8 +561,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>660</xloc>
-      <yloc>180</yloc>
+      <xloc>656</xloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
     <entry>
@@ -599,8 +599,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>780</xloc>
-      <yloc>180</yloc>
+      <xloc>768</xloc>
+      <yloc>96</yloc>
       <attributes_kjc/>
     </entry>
   </entries>
@@ -669,15 +669,6 @@
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>update-date-dim</from>
-      <to>archive-complete-files</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>archive-complete-files</from>
       <to>t:get_prev_jobentry_log</to>
       <from_nr>0</from_nr>
@@ -715,20 +706,20 @@
     </hop>
     <hop>
       <from>link-session-bandwidth</from>
-      <to>Success</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>link-session-bandwidth</from>
       <to>t:get_prev_jobentry_log</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>update-date-dim</from>
+      <to>Success</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
   </hops>

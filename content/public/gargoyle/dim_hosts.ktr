@@ -442,7 +442,7 @@
   <notepads>
   </notepads>
   <connection>
-    <name>gargoyle_mon</name>
+    <name>gargoyle_bwmon</name>
     <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
     <type>POSTGRESQL</type>
     <access>Native</access>
@@ -569,11 +569,6 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>tfi:wan_host</from>
-      <to>ac:gargoyle</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>fvn:null-host-name</from>
       <to>js:split-owner</to>
       <enabled>Y</enabled>
@@ -581,6 +576,16 @@
     <hop>
       <from>js:split-owner</from>
       <to>dl:hosts</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>tfi:wan_host</from>
+      <to>sv:wan-host</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sv:wan-host</from>
+      <to>ac:gargoyle</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -636,7 +641,7 @@
     </partitioning>
     <schema/>
     <table>dim_hosts</table>
-    <connection>gargoyle_mon</connection>
+    <connection>gargoyle_bwmon</connection>
     <commit>100</commit>
     <update>Y</update>
     <fields>
@@ -837,6 +842,53 @@
     </remotesteps>
     <GUI>
       <xloc>450</xloc>
+      <yloc>270</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>js:split-owner</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>//Script here
+
+var host_owner='unknown';
+host_owner = host_name.split("-")[0];</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>host_owner</name>
+        <rename>host_owner</rename>
+        <type>String</type>
+        <length>25</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>900</xloc>
       <yloc>270</yloc>
       <draw>Y</draw>
     </GUI>
@@ -1095,6 +1147,46 @@
     </GUI>
   </step>
   <step>
+    <name>sv:wan-host</name>
+    <type>SetVariable</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <field_name>host_ip</field_name>
+        <variable_name>WAN_HOST_IP</variable_name>
+        <variable_type>ROOT_JOB</variable_type>
+        <default_value/>
+      </field>
+      <field>
+        <field_name>host_name</field_name>
+        <variable_name>WAN_HOST_NAME</variable_name>
+        <variable_type>ROOT_JOB</variable_type>
+        <default_value/>
+      </field>
+    </fields>
+    <use_formatting>Y</use_formatting>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>360</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
     <name>tfi:conn_hosts</name>
     <type>TextFileInput</type>
     <description/>
@@ -1156,7 +1248,7 @@
         <position>-1</position>
         <length>15</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
       <field>
@@ -1276,7 +1368,7 @@
         <position>-1</position>
         <length>15</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
       <field>
@@ -1411,7 +1503,7 @@
         <position>-1</position>
         <length>15</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
       <field>
@@ -1531,7 +1623,7 @@
         <position>-1</position>
         <length>15</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
+        <trim_type>both</trim_type>
         <repeat>N</repeat>
       </field>
       <field>
@@ -1584,55 +1676,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>330</xloc>
+      <xloc>208</xloc>
       <yloc>360</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>js:split-owner</name>
-    <type>ScriptValueMod</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <compatible>N</compatible>
-    <optimizationLevel>9</optimizationLevel>
-    <jsScripts>
-      <jsScript>
-        <jsScript_type>0</jsScript_type>
-        <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-
-var host_owner='unknown';
-host_owner = host_name.split("-")[0];</jsScript_script>
-      </jsScript>
-    </jsScripts>
-    <fields>
-      <field>
-        <name>host_owner</name>
-        <rename>host_owner</rename>
-        <type>String</type>
-        <length>25</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>900</xloc>
-      <yloc>270</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

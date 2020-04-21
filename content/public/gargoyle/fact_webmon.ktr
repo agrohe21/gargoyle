@@ -492,57 +492,6 @@
       </attribute>
     </attributes>
   </connection>
-  <connection>
-    <name>gargoyle_mon</name>
-    <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
-    <type>POSTGRESQL</type>
-    <access>Native</access>
-    <database>${GARGOYLE_BWMON_DATABASE}</database>
-    <port>5432</port>
-    <username>${GARGOYLE_BWMON_USER}</username>
-    <password>${GARGOYLE_BWMON_PASS}</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute>
-        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>IS_CLUSTERED</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>PORT_NUMBER</code>
-        <attribute>5432</attribute>
-      </attribute>
-      <attribute>
-        <code>PRESERVE_RESERVED_WORD_CASE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>QUOTE_ALL_FIELDS</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>USE_POOLING</code>
-        <attribute>N</attribute>
-      </attribute>
-    </attributes>
-  </connection>
   <order>
     <hop>
       <from>to:webmon</from>
@@ -892,7 +841,7 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>gargoyle_mon</connection>
+    <connection>gargoyle_bwmon</connection>
     <schema/>
     <table>f_webmon</table>
     <commit>1000</commit>

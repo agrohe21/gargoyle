@@ -23,6 +23,8 @@ while [ 1 ]; do
    /root/projects/gargoyle/scripts/bw_get_download.sh >> /tmp/usb_mount/dev_sda1/nfs/bw-dlminute-$current_date_time
    /root/projects/gargoyle/scripts/bw_get_upload.sh   >> /tmp/usb_mount/dev_sda1/nfs/bw-ulminute-$current_date_time
    /root/projects/gargoyle/scripts/get_webmon.sh      >> /tmp/usb_mount/dev_sda1/nfs/web-sites-$current_date_time
+   /root/projects/gargoyle/scripts/get_tcpconn.sh     >> /tmp/usb_mount/dev_sda1/nfs/conn-tcp-$current_date_time
+   /root/projects/gargoyle/scripts/get_udpconn.sh     >> /tmp/usb_mount/dev_sda1/nfs/conn-udp-$current_date_time
 
    sleep $wait_sec
 done

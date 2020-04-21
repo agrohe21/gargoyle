@@ -95,6 +95,16 @@ left outer JOIN public.dim_hosts t3 on t3.host_id  = t1.host_id
 where date_trunc('day', t2."DATE") = to_date('2020-03-26', 'YYYY-MM-DD')
 
 
+select t2.hour_day, t3.host_name, count(*), sum(session_total_mbytes) as total_mybtes, sum(session_duration) as total_duration, avg(session_duration) as avg_duration
+from f_session t1
+inner join dim_date t2 on t2.date_key = t1.session_start_date_key
+inner join dim_hosts t3 on t3.host_id = t1.host_id
+where host_owner ='eva'
+  and date_trunc('day', t2."DATE") = CURRENT_DATE
+group by t2.hour_day, t3.host_name
+order by t2.hour_day
+
+
 delete from f_session t1
 where exists (
 	select 'x'
@@ -108,3 +118,4 @@ where exists (
 	UPDATE f_bandwidth SET session_id = '76bf3800-bee1-4a5e-8c8e-aa12d9a0d998'
 	select * from f_bandwidth
 	WHERE  ( ( host_id = 40  ) ) AND    ( ( date_key BETWEEN 1585237020000 AND 1585237140000  ) )
+	
