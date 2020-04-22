@@ -144,6 +144,16 @@
       </Level>
     </Hierarchy>
   </Dimension>
+  <Dimension type="StandardDimension" visible="true" highCardinality="false" name="wan_host">
+    <Hierarchy name="domain" visible="true" hasAll="true" primaryKey="wan_host_id" caption="WAN Host">
+      <Table name="dim_wan_host" schema="public">
+      </Table>
+      <Level approxRowCount="10000" name="domain" visible="true" column="wan_domain" type="String" internalType="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="WAN Host">
+      </Level>
+      <Level approxRowCount="100000" name="fqdn" visible="true" column="fqdn" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="FQDN">
+      </Level>
+    </Hierarchy>
+  </Dimension>
   <Cube name="bw" caption="Bandwidth" visible="true" cache="false" enabled="true">
     <Table name="f_bandwidth" schema="public">
     </Table>
@@ -157,15 +167,15 @@
     </Measure>
     <Measure name="dl_bytes" column="download_bytes" datatype="Numeric" aggregator="sum" caption="Download Bytes" visible="true">
     </Measure>
-    <Measure name="ul_bytes" column="upload_bytes" aggregator="sum" caption="Upload Bytes" visible="true">
+    <Measure name="ul_bytes" column="upload_bytes" datatype="Numeric" aggregator="sum" caption="Upload Bytes" visible="true">
     </Measure>
-    <Measure name="sum_total_bytes" column="total_bytes" aggregator="sum" caption="Total Bytes" visible="true">
+    <Measure name="sum_total_bytes" column="total_bytes" datatype="Numeric" aggregator="sum" caption="Total Bytes" visible="true">
     </Measure>
-    <Measure name="avg_total_bytes" column="total_bytes" aggregator="avg" caption="Total Bytes Avg" visible="true">
+    <Measure name="avg_total_bytes" column="total_bytes" datatype="Numeric" aggregator="avg" caption="Total Bytes Avg" visible="true">
     </Measure>
-    <Measure name="max_total_bytes" column="total_bytes" aggregator="max" caption="Total Bytes Max" visible="true">
+    <Measure name="max_total_bytes" column="total_bytes" datatype="Numeric" aggregator="max" caption="Total Bytes Max" visible="true">
     </Measure>
-    <Measure name="dcount_date_key" column="date_key" datatype="Integer" aggregator="distinct-count" caption="Seconds" visible="true">
+    <Measure name="dcount_date_key" column="date_key" datatype="Numeric" aggregator="distinct-count" caption="Seconds" visible="true">
     </Measure>
     <Measure name="dcount_session_id" column="session_id" datatype="Integer" aggregator="distinct-count" caption="Sessions" visible="true">
     </Measure>
@@ -175,8 +185,13 @@
     </CalculatedMember>
     <CalculatedMember name="cm_sum_ul_mb" caption="Upload MB" formula="(Measures.ul_bytes/1000000)" dimension="Measures" visible="true">
     </CalculatedMember>
+    <NamedSet name="ns_past_day">
+      <Formula>
+        <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE).lag(24):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE)]]>
+      </Formula>
+    </NamedSet>
   </Cube>
-  <Cube name="session" caption="Sessions" visible="true" cache="true" enabled="true">
+  <Cube name="session" caption="Sessions" visible="true" cache="false" enabled="true">
     <Table name="f_session" schema="public">
     </Table>
     <DimensionUsage source="session" name="session_dim" caption="Session" visible="true" foreignKey="session_id" highCardinality="false">
@@ -201,32 +216,88 @@
     </Measure>
     <CalculatedMember name="cm_avg_sum_session_total_mbytes_week" caption="Daily Rate" formula="Avg([ns_past_week], Measures.sum_session_total_mbytes)" dimension="Measures" visible="true">
     </CalculatedMember>
-    <CalculatedMember name="cm_avg_sum_session_total_mbytes_day" formatString="" caption="Hourly Rate" formula="Avg([ns_past_day], Measures.sum_session_total_mbytes)" dimension="Measures" visible="true">
+    <CalculatedMember name="cm_avg_sum_session_total_mbytes_day" caption="Hourly Rate" formula="Avg([ns_past_day], Measures.sum_session_total_mbytes)" dimension="Measures" visible="true">
     </CalculatedMember>
-    <NamedSet name="ns_past_week" formula="">
+    <NamedSet name="ns_past_week">
       <Formula>
         <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(7):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
       </Formula>
     </NamedSet>
-    <NamedSet name="ns_past_month" formula="">
+    <NamedSet name="ns_past_month">
       <Formula>
         <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(30):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
       </Formula>
     </NamedSet>
-    <NamedSet name="ns_past_quarter" formula="">
+    <NamedSet name="ns_past_quarter">
       <Formula>
         <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(120):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
       </Formula>
     </NamedSet>
-    <NamedSet name="ns_past_year" formula="">
+    <NamedSet name="ns_past_year">
       <Formula>
         <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE).lag(365):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]', BEFORE)]]>
       </Formula>
     </NamedSet>
-    <NamedSet name="ns_past_day" formula="">
+    <NamedSet name="ns_past_day">
       <Formula>
         <![CDATA[CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE).lag(24):CurrentDateMember([date_dim.ymdhms], '["date_dim.ymdhms"]\.[yyyy]\.[m]\.[d]\.[h]', BEFORE)]]>
       </Formula>
     </NamedSet>
   </Cube>
+  <Cube name="connection" caption="Connections" visible="true" cache="false" enabled="true">
+    <Table name="f_connection" schema="public">
+    </Table>
+    <DimensionUsage source="user" name="user_dim" caption="User" visible="true" foreignKey="host_id" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="date" name="date_dim" caption="Date" visible="true" foreignKey="date_key" highCardinality="false">
+    </DimensionUsage>
+    <DimensionUsage source="wan_host" name="wan_host_dim" caption="WAN Host" visible="true" foreignKey="wan_host_id" highCardinality="false">
+    </DimensionUsage>
+    <Dimension type="StandardDimension" visible="true" highCardinality="false" name="proto" caption="Protocol">
+      <Hierarchy name="proto" visible="true" hasAll="true" caption="Protocol">
+        <Level name="proto" visible="true" column="proto" type="String" uniqueMembers="false" levelType="Regular" hideMemberIf="Never" caption="Protocol">
+        </Level>
+      </Hierarchy>
+    </Dimension>
+    <Measure name="dcount_host_id" column="host_id" aggregator="distinct-count" caption="Hosts" visible="true">
+    </Measure>
+    <Measure name="dcount_wan_host_id" column="wan_host_id" aggregator="distinct-count" caption="WAN Host" visible="true">
+    </Measure>
+    <Measure name="sum_total_bytes" column="total_bytes" datatype="Integer" aggregator="sum" caption="Total Bytes" visible="true">
+    </Measure>
+    <Measure name="sum_dl_bytes" column="dl_bytes" datatype="Numeric" aggregator="sum" caption="Down Bytes" visible="true">
+    </Measure>
+    <Measure name="sum_ul_bytes" column="ul_bytes" datatype="Numeric" aggregator="sum" caption="Up Bytes" visible="true">
+    </Measure>
+    <CalculatedMember name="cm_sum_total_mb" formatString="#.00" caption="Total MB" formula="(Measures.sum_total_bytes/1000000)" dimension="Measures" visible="true">
+    </CalculatedMember>
+    <CalculatedMember name="cm_sum_dl_mb" formatString="" caption="Download MB" formula="(Measures.sum_dl_bytes/1000000)" dimension="Measures" visible="true">
+    </CalculatedMember>
+    <CalculatedMember name="cm_sum_ul_mb" formatString="" caption="Upload MB" formula="(Measures.sum_ul_bytes/1000000)" dimension="Measures" visible="true">
+    </CalculatedMember>
+  </Cube>
+  <VirtualCube enabled="true" name="usage" caption="Usage" visible="true">
+    <VirtualCubeDimension cubeName="bw" caption="User" visible="true" foreignKey="host_id" highCardinality="false" name="user_dim">
+    </VirtualCubeDimension>
+    <VirtualCubeDimension cubeName="bw" caption="Date" visible="true" foreignKey="date_key" highCardinality="false" name="date_dim">
+    </VirtualCubeDimension>
+    <VirtualCubeMeasure cubeName="bw" name="[Measures].[cm_sum_total_mb]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="session" name="[Measures].[sum_session_total_mbytes]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="session" name="[Measures].[sum_session_duration]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="connection" name="[Measures].[sum_total_bytes]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="session" name="[Measures].[dcount_session_id]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="bw" name="[Measures].[dcount_host_id]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="connection" name="[Measures].[dcount_wan_host_id]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="bw" name="[Measures].[cm_sum_dl_mb]" visible="true">
+    </VirtualCubeMeasure>
+    <VirtualCubeMeasure cubeName="bw" name="[Measures].[cm_sum_ul_mb]" visible="true">
+    </VirtualCubeMeasure>
+  </VirtualCube>
 </Schema>
