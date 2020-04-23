@@ -786,27 +786,21 @@ where ([SLICER])
       </field>
       <field>
         <name>[Measures].[dcount_host_id]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[dcount_session_id]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[cm_sum_total_mb]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[cm_sum_ul_mb]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[cm_sum_dl_mb]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[dcount_date_key]</name>
-        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -842,7 +836,6 @@ where ([SLICER])
       </field>
       <field>
         <name>[Measures].[dcount_wan_host_id]</name>
-        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
@@ -922,47 +915,36 @@ where ([SLICER])
       </field>
       <field>
         <name>[Measures].[dcount_host_id]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[dcount_session_id]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[cm_sum_total_mb]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[cm_sum_ul_mb]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[cm_sum_dl_mb]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[sum_session_duration]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[avg_session_duration]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[sum_session_total_mbytes]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[avg_session_total_mbytes]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[dcount_wan_host_id]</name>
-        <rename/>
       </field>
       <field>
         <name>[Measures].[dcount_date_key]</name>
-        <rename/>
       </field>
       <select_unspecified>N</select_unspecified>
     </fields>
