@@ -1,4 +1,4 @@
-﻿--Session counts on bandwidth
+--Session counts on bandwidth
 select "YEAR", month_year, day_month, hour_day, count(distinct session_id)
 from f_bandwidth t1
 inner join dim_date t2 on t2.date_key = t1.date_key
@@ -95,14 +95,20 @@ left outer JOIN public.dim_hosts t3 on t3.host_id  = t1.host_id
 where date_trunc('day', t2."DATE") = to_date('2020-03-26', 'YYYY-MM-DD')
 
 
-select t2.hour_day, t3.host_name, count(*), sum(session_total_mbytes) as total_mybtes, sum(session_duration) as total_duration, avg(session_duration) as avg_duration
+select
+ t3.host_name, t2.hour_day, t2."DATE" as start_date, t4."DATE" as end_date, t6.fqdn
+,count(*), sum(session_total_mbytes) as total_mybtes, sum(session_duration) as total_duration, avg(session_duration) as avg_duration
 from f_session t1
 inner join dim_date t2 on t2.date_key = t1.session_start_date_key
 inner join dim_hosts t3 on t3.host_id = t1.host_id
+inner join dim_date t4 on t4.date_key = t1.session_end_date_key
+left outer join f_connection t5 on t5.date_key between t1.session_start_date_key and t1.sessioN_end_date_key
+left outer join dim_wan_host t6 on t6.wan_host_id = t5.wan_host_id
 where host_owner ='eva'
+  and host_name = 'eva-iPhone-11'
   and date_trunc('day', t2."DATE") = CURRENT_DATE
-group by t2.hour_day, t3.host_name
-order by t2.hour_day
+group by t2.hour_day, t3.host_name, t2."DATE", t4."DATE", t6.fqdn
+order by host_name, t2.hour_day
 
 
 delete from f_session t1
