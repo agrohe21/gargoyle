@@ -912,7 +912,7 @@
 for (r=0,j=trunc(parseFloat(duration)); r==0 || r&lt;j ; r++) {
 	row = createRowCopy(getOutputRowMeta().size());
     i = getInputRowMeta().size(); //change to nbr of fields preceeding this step
-	new_date = truncDate(dateAdd(start_datetime,"ss", r), 0);
+	new_date = truncDate(dateAdd(start_datetime,"mi", r), 0);
 	row[i++] = new_date.getTime();
 	row[i++] = new_date.getTime();
     row[i++] = new_date;
@@ -926,34 +926,6 @@ trans_Status = SKIP_TRANSFORMATION;
         <jsScript_type>1</jsScript_type>
         <jsScript_name>Item_0</jsScript_name>
         <jsScript_script>var r,j, i, new_date;</jsScript_script>
-      </jsScript>
-      <jsScript>
-        <jsScript_type>-1</jsScript_type>
-        <jsScript_name>truncDate_Sample</jsScript_name>
-        <jsScript_script>
-// 
-// Usage:
-//  truncDate(var1, var2);
-//
-// 1: a date - the date-time to be truncated
-// 2: the requested precision:
-//    - 5 : truncate MONTHS (set to 1)
-//    - 4 : truncate DAYS (set to 1)
-//    - 3 : truncate HOURS (set to 0)
-//    - 2 : truncate MINUTES (set to 0)
-//    - 1 : truncate SECONDS (set to 0)
-//    - 0 : truncate MILLISECONDS (set to 0)
-//
-// 2008-02-29
-//
-var dateTime = new Date();
-var date0 = truncDate(dateTime, 0); // gives back today at yyyy/MM/dd HH:mm:ss.000
-var date1 = truncDate(dateTime, 1); // gives back today at yyyy/MM/dd HH:mm:00.000
-var date2 = truncDate(dateTime, 2); // gives back today at yyyy/MM/dd HH:00:00.000
-var date3 = truncDate(dateTime, 3); // gives back today at yyyy/MM/dd 00:00:00.000
-var date4 = truncDate(dateTime, 4); // gives back today at yyyy/MM/01 00:00:00.000
-var date5 = truncDate(dateTime, 5); // gives back today at yyyy/01/01 00:00:00.000
-</jsScript_script>
       </jsScript>
     </jsScripts>
     <fields>

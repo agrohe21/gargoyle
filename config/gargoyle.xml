@@ -259,6 +259,8 @@
         </Level>
       </Hierarchy>
     </Dimension>
+    <DimensionUsage source="session" name="session_dim" caption="Session" visible="true" foreignKey="session_id">
+    </DimensionUsage>
     <Measure name="dcount_host_id" column="host_id" aggregator="distinct-count" caption="Hosts" visible="true">
     </Measure>
     <Measure name="dcount_wan_host_id" column="wan_host_id" aggregator="distinct-count" caption="WAN Host" visible="true">
@@ -271,9 +273,9 @@
     </Measure>
     <CalculatedMember name="cm_sum_total_mb" formatString="#.00" caption="Total MB" formula="(Measures.sum_total_bytes/1000000)" dimension="Measures" visible="true">
     </CalculatedMember>
-    <CalculatedMember name="cm_sum_dl_mb" formatString="" caption="Download MB" formula="(Measures.sum_dl_bytes/1000000)" dimension="Measures" visible="true">
+    <CalculatedMember name="cm_sum_dl_mb" caption="Download MB" formula="(Measures.sum_dl_bytes/1000000)" dimension="Measures" visible="true">
     </CalculatedMember>
-    <CalculatedMember name="cm_sum_ul_mb" formatString="" caption="Upload MB" formula="(Measures.sum_ul_bytes/1000000)" dimension="Measures" visible="true">
+    <CalculatedMember name="cm_sum_ul_mb" caption="Upload MB" formula="(Measures.sum_ul_bytes/1000000)" dimension="Measures" visible="true">
     </CalculatedMember>
   </Cube>
   <VirtualCube enabled="true" name="usage" caption="Usage" visible="true">
