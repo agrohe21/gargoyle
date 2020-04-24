@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>fact_quota_event</name>
+    <name>session_connection_runner</name>
     <description/>
     <extended_description/>
     <trans_version/>
@@ -9,11 +9,6 @@
     <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
-      <parameter>
-        <name>file_date</name>
-        <default_value>2020-03-16-23-24-59</default_value>
-        <description/>
-      </parameter>
     </parameters>
     <log>
       <trans-log-table>
@@ -433,105 +428,29 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2017/09/11 15:21:24.884</created_date>
+    <created_date>2020/03/25 09:35:06.891</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2017/09/11 15:21:24.884</modified_date>
+    <modified_date>2020/03/25 09:35:06.891</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
   <notepads>
   </notepads>
-  <connection>
-    <name>gargoyle_bwmon</name>
-    <server>${GARGOYLE_BWMON_DATA_SERVER}</server>
-    <type>POSTGRESQL</type>
-    <access>Native</access>
-    <database>${GARGOYLE_BWMON_DATABASE}</database>
-    <port>5432</port>
-    <username>${GARGOYLE_BWMON_USER}</username>
-    <password>${GARGOYLE_BWMON_PASS}</password>
-    <servername/>
-    <data_tablespace/>
-    <index_tablespace/>
-    <attributes>
-      <attribute>
-        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>IS_CLUSTERED</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>PORT_NUMBER</code>
-        <attribute>5432</attribute>
-      </attribute>
-      <attribute>
-        <code>PRESERVE_RESERVED_WORD_CASE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>QUOTE_ALL_FIELDS</code>
-        <attribute>N</attribute>
-      </attribute>
-      <attribute>
-        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
-        <attribute>Y</attribute>
-      </attribute>
-      <attribute>
-        <code>USE_POOLING</code>
-        <attribute>N</attribute>
-      </attribute>
-    </attributes>
-  </connection>
   <order>
     <hop>
-      <from>tfi:quota</from>
-      <to>dlu:update-quota-dim</to>
+      <from>gsi:start_date</from>
+      <to>js:calc-truncd-date</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>dlu:update-quota-dim</from>
-      <to>js:get-filename</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>js:get-filename</from>
-      <to>dbl:get_date_key</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>dbl:get_date_key</from>
-      <to>Filter rows</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Filter rows</from>
-      <to>to:quota_measurements</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>Filter rows</from>
-      <to>Abort</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>to:quota_measurements</from>
-      <to>duplicate records</to>
+      <from>js:calc-truncd-date</from>
+      <to>te:session-bandwith</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Abort</name>
-    <type>Abort</type>
+    <name>gsi:start_date</name>
+    <type>SystemInfo</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -540,162 +459,12 @@
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <row_threshold>0</row_threshold>
-    <message/>
-    <always_log_rows>Y</always_log_rows>
-    <abort_option>ABORT</abort_option>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>544</xloc>
-      <yloc>320</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Filter rows</name>
-    <type>FilterRows</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <send_true_to>to:quota_measurements</send_true_to>
-    <send_false_to>Abort</send_false_to>
-    <compare>
-      <condition>
-        <negated>N</negated>
-        <conditions>
-          <condition>
-            <negated>N</negated>
-            <leftvalue>quota_key</leftvalue>
-            <function>IS NOT NULL</function>
-            <rightvalue/>
-          </condition>
-          <condition>
-            <negated>N</negated>
-            <operator>AND</operator>
-            <leftvalue>date_key</leftvalue>
-            <function>IS NOT NULL</function>
-            <rightvalue/>
-          </condition>
-        </conditions>
-      </condition>
-    </compare>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>544</xloc>
-      <yloc>192</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>dbl:get_date_key</name>
-    <type>DBLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <connection>gargoyle_bwmon</connection>
-    <cache>Y</cache>
-    <cache_load_all>N</cache_load_all>
-    <cache_size>0</cache_size>
-    <lookup>
-      <schema/>
-      <table>dim_date</table>
-      <orderby/>
-      <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
-      <key>
-        <name>quota_date_utc</name>
-        <field>date_utc</field>
-        <condition>=</condition>
-        <name2/>
-      </key>
-      <value>
-        <name>date_key</name>
-        <rename>date_key</rename>
-        <default/>
-        <type>Integer</type>
-      </value>
-    </lookup>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>432</xloc>
-      <yloc>192</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>dlu:update-quota-dim</name>
-    <type>DimensionLookup</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <schema/>
-    <table>dim_quota</table>
-    <connection>gargoyle_bwmon</connection>
-    <commit>100</commit>
-    <update>N</update>
     <fields>
-      <key>
-        <name>quota</name>
-        <lookup>quota</lookup>
-      </key>
-      <date>
-        <name/>
-        <from>date_from</from>
-        <to>date_to</to>
-      </date>
-      <return>
-        <name>quota_key</name>
-        <rename/>
-        <creation_method>tablemax</creation_method>
-        <use_autoinc>N</use_autoinc>
-        <version>version</version>
-      </return>
+      <field>
+        <name>start_date</name>
+        <type>today start</type>
+      </field>
     </fields>
-    <sequence/>
-    <min_year>1900</min_year>
-    <max_year>2199</max_year>
-    <cache_size>5000</cache_size>
-    <preload_cache>N</preload_cache>
-    <use_start_date_alternative>N</use_start_date_alternative>
-    <start_date_alternative>none</start_date_alternative>
-    <start_date_field_name/>
-    <useBatch>N</useBatch>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -705,38 +474,13 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>192</xloc>
-      <yloc>192</yloc>
+      <xloc>90</xloc>
+      <yloc>180</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>duplicate records</name>
-    <type>Dummy</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>688</xloc>
-      <yloc>320</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>js:get-filename</name>
+    <name>js:calc-truncd-date</name>
     <type>ScriptValueMod</type>
     <description/>
     <distribute>Y</distribute>
@@ -752,161 +496,66 @@
       <jsScript>
         <jsScript_type>0</jsScript_type>
         <jsScript_name>Script 1</jsScript_name>
-        <jsScript_script>//Script here
-
-filename = substr(file_name, indexOf(file_name, "quota-event")+12);
-//writeToLog("b", filename);
-
-file_date = str2date(filename, "yyyy-MM-dd-HH-mm-ss");
-file_date = truncDate(file_date, 1);
-date_utc  = file_date.getTime();</jsScript_script>
+        <jsScript_script>var date_str = date2str(start_date,"yyyy-MM-dd");
+</jsScript_script>
       </jsScript>
       <jsScript>
-        <jsScript_type>1</jsScript_type>
-        <jsScript_name>Item_0</jsScript_name>
-        <jsScript_script>//Script here
-
-var filename, file_date, date_utc;</jsScript_script>
+        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>date2str_Sample</jsScript_name>
+        <jsScript_script>// Converts the given Date to a string Value.
+//
+// Usage:
+// date2str(var);
+// 1: Date - The Variable with the Date to convert.
+// This call uses your localized format.
+//
+// date2str(var, var);
+// 1: Date - The Variable with the Date to convert.
+// 2: String - The Format:
+//        yy / yyyy - 06 / 2006
+//        MM / MMM / MMMMM - 11 / Nov / November
+//        d / dd  - 1 / 01
+//        E / EEEE - Tue / Tuesday
+//        hh / HH - 11 / 23
+//        m / mm - 5 / 05
+//        s / ss - 8 / 08
+//
+// date2str(var, var, var);
+// 1: Date - The Variable with the Date to convert.
+// 2: String - The Format:
+// 3: String - The Locale Parameter
+//    A valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+//
+// date2str(var, var, var, var);
+// 1: Date - The Variable with the Date to convert.
+// 2: String - The Format:
+// 3: String - The Locale Parameter
+//    A valid ISO Language Code. (DE = German, EN = English, FR = France, ...)
+// 4: String - The Timezone Parameter.
+//    A valid timezone: EST, GMT, ... (if invalid GMT will be selected as default)
+// 
+// 2006-11-15
+//
+var dValue = new Date();
+Alert(date2str(dValue));
+Alert(date2str(dValue,"dd.MM.yyyy"));
+Alert(date2str(dValue,"dd.MM.yyyy HH:mm:ss"));
+Alert(date2str(dValue,"E.MMM.yyyy","DE"));
+Alert(date2str(dValue,"dd.MM.yyyy HH:mm:ss","EN"));
+Alert(date2str(dValue,"dd.MM.yyyy HH:mm:ss","EN", "EST"));
+     </jsScript_script>
       </jsScript>
     </jsScripts>
     <fields>
       <field>
-        <name>file_date</name>
-        <rename>quota_date</rename>
-        <type>Date</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-      <field>
-        <name>date_utc</name>
-        <rename>quota_date_utc</rename>
-        <type>BigNumber</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <replace>N</replace>
-      </field>
-    </fields>
-    <attributes/>
-    <cluster_schema/>
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>320</xloc>
-      <yloc>192</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>tfi:quota</name>
-    <type>TextFileInput</type>
-    <description/>
-    <distribute>Y</distribute>
-    <custom_distribution/>
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name/>
-    </partitioning>
-    <accept_filenames>N</accept_filenames>
-    <passing_through_fields>N</passing_through_fields>
-    <accept_field/>
-    <accept_stepname/>
-    <separator> </separator>
-    <enclosure>"</enclosure>
-    <enclosure_breaks>N</enclosure_breaks>
-    <escapechar/>
-    <header>N</header>
-    <nr_headerlines>1</nr_headerlines>
-    <footer>N</footer>
-    <nr_footerlines>1</nr_footerlines>
-    <line_wrapped>N</line_wrapped>
-    <nr_wraps>1</nr_wraps>
-    <layout_paged>N</layout_paged>
-    <nr_lines_per_page>80</nr_lines_per_page>
-    <nr_lines_doc_header>0</nr_lines_doc_header>
-    <noempty>Y</noempty>
-    <include>Y</include>
-    <include_field>file_name</include_field>
-    <rownum>N</rownum>
-    <rownumByFile>N</rownumByFile>
-    <rownum_field/>
-    <format>Unix</format>
-    <encoding/>
-    <length>Characters</length>
-    <add_to_result_filenames>Y</add_to_result_filenames>
-    <file>
-      <name>${PROJECT_INPUT}/processing</name>
-      <filemask>quota-event-.*${file_date}</filemask>
-      <exclude_filemask/>
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-      <type>CSV</type>
-      <compression>None</compression>
-    </file>
-    <filters>
-    </filters>
-    <fields>
-      <field>
-        <name>quota</name>
+        <name>date_str</name>
+        <rename>date_str</rename>
         <type>String</type>
-        <format/>
-        <currency>$</currency>
-        <decimal>.</decimal>
-        <group>,</group>
-        <nullif>-</nullif>
-        <ifnull/>
-        <position>-1</position>
-        <length>50</length>
+        <length>10</length>
         <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-      </field>
-      <field>
-        <name>quota_pct_used</name>
-        <type>Number</type>
-        <format>#.00</format>
-        <currency/>
-        <decimal/>
-        <group/>
-        <nullif/>
-        <ifnull/>
-        <position>-1</position>
-        <length>5</length>
-        <precision>4</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
+        <replace>N</replace>
       </field>
     </fields>
-    <limit>0</limit>
-    <error_ignored>N</error_ignored>
-    <skip_bad_files>N</skip_bad_files>
-    <file_error_field/>
-    <file_error_message_field/>
-    <error_line_skipped>N</error_line_skipped>
-    <error_count_field/>
-    <error_fields_field/>
-    <error_text_field/>
-    <bad_line_files_destination_directory/>
-    <bad_line_files_extension>warning</bad_line_files_extension>
-    <error_line_files_destination_directory/>
-    <error_line_files_extension>error</error_line_files_extension>
-    <line_number_files_destination_directory/>
-    <line_number_files_extension>line</line_number_files_extension>
-    <date_format_lenient>Y</date_format_lenient>
-    <date_format_locale>en_US</date_format_locale>
-    <shortFileFieldName/>
-    <pathFieldName/>
-    <hiddenFieldName/>
-    <lastModificationTimeFieldName/>
-    <uriNameFieldName/>
-    <rootUriNameFieldName/>
-    <extensionFieldName/>
-    <sizeFieldName/>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -916,14 +565,14 @@ var filename, file_date, date_utc;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>64</xloc>
-      <yloc>192</yloc>
+      <xloc>210</xloc>
+      <yloc>180</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>to:quota_measurements</name>
-    <type>TableOutput</type>
+    <name>te:session-bandwith</name>
+    <type>TransExecutor</type>
     <description/>
     <distribute>Y</distribute>
     <custom_distribution/>
@@ -932,37 +581,41 @@ var filename, file_date, date_utc;</jsScript_script>
       <method>none</method>
       <schema_name/>
     </partitioning>
-    <connection>gargoyle_bwmon</connection>
-    <schema/>
-    <table>f_quota_event</table>
-    <commit>1000</commit>
-    <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
-    <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
-    <partitioning_enabled>N</partitioning_enabled>
-    <partitioning_field/>
-    <partitioning_daily>N</partitioning_daily>
-    <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>N</tablename_in_field>
-    <tablename_field/>
-    <tablename_in_table>Y</tablename_in_table>
-    <return_keys>N</return_keys>
-    <return_field/>
-    <fields>
-      <field>
-        <column_name>quota_key</column_name>
-        <stream_name>quota_key</stream_name>
-      </field>
-      <field>
-        <column_name>date_key</column_name>
-        <stream_name>date_key</stream_name>
-      </field>
-      <field>
-        <column_name>quota_pct_used</column_name>
-        <stream_name>quota_pct_used</stream_name>
-      </field>
-    </fields>
+    <specification_method>filename</specification_method>
+    <trans_object_id/>
+    <trans_name/>
+    <filename>${PROJECT_CONTENT}/public/gargoyle/session_connection.ktr</filename>
+    <directory_path/>
+    <group_size>1</group_size>
+    <group_field/>
+    <group_time/>
+    <parameters>
+      <variablemapping>
+        <variable>session_date</variable>
+        <field>date_str</field>
+        <input/>
+      </variablemapping>
+      <inherit_all_vars>Y</inherit_all_vars>
+    </parameters>
+    <execution_result_target_step/>
+    <execution_time_field>ExecutionTime</execution_time_field>
+    <execution_result_field>ExecutionResult</execution_result_field>
+    <execution_errors_field>ExecutionNrErrors</execution_errors_field>
+    <execution_lines_read_field>ExecutionLinesRead</execution_lines_read_field>
+    <execution_lines_written_field>ExecutionLinesWritten</execution_lines_written_field>
+    <execution_lines_input_field>ExecutionLinesInput</execution_lines_input_field>
+    <execution_lines_output_field>ExecutionLinesOutput</execution_lines_output_field>
+    <execution_lines_rejected_field>ExecutionLinesRejected</execution_lines_rejected_field>
+    <execution_lines_updated_field>ExecutionLinesUpdated</execution_lines_updated_field>
+    <execution_lines_deleted_field>ExecutionLinesDeleted</execution_lines_deleted_field>
+    <execution_files_retrieved_field>ExecutionFilesRetrieved</execution_files_retrieved_field>
+    <execution_exit_status_field>ExecutionExitStatus</execution_exit_status_field>
+    <execution_log_text_field>ExecutionLogText</execution_log_text_field>
+    <execution_log_channelid_field>ExecutionLogChannelId</execution_log_channelid_field>
+    <result_rows_target_step/>
+    <result_files_target_step/>
+    <result_files_file_name_field>FileName</result_files_file_name_field>
+    <executors_output_step/>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -972,31 +625,15 @@ var filename, file_date, date_utc;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>688</xloc>
-      <yloc>192</yloc>
+      <xloc>360</xloc>
+      <yloc>180</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step_error_handling>
-    <error>
-      <source_step>to:quota_measurements</source_step>
-      <target_step>duplicate records</target_step>
-      <is_enabled>Y</is_enabled>
-      <nr_valuename/>
-      <descriptions_valuename/>
-      <fields_valuename/>
-      <codes_valuename/>
-      <max_errors/>
-      <max_pct_errors/>
-      <min_pct_rows/>
-    </error>
   </step_error_handling>
   <slave-step-copy-partition-distribution>
   </slave-step-copy-partition-distribution>
   <slave_transformation>N</slave_transformation>
-  <attributes>
-    <group>
-      <name>explorerState</name>
-    </group>
-  </attributes>
+  <attributes/>
 </transformation>

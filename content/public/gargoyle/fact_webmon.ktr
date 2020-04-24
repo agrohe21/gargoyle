@@ -11,7 +11,7 @@
     <parameters>
       <parameter>
         <name>file_date</name>
-        <default_value>2020-03-17-12-41-27</default_value>
+        <default_value>2020-04-23-10-37-10</default_value>
         <description/>
       </parameter>
     </parameters>
@@ -499,18 +499,8 @@
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>dbl:lookup-host</from>
-      <to>to:webmon</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
       <from>dbl:lookup-date</from>
       <to>dbl:lookup-host</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>tfi:web_files</from>
-      <to>js get-date</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
@@ -518,7 +508,319 @@
       <to>dbl:lookup-date</to>
       <enabled>Y</enabled>
     </hop>
+    <hop>
+      <from>ac:commands</from>
+      <to>ep:wan-lookup</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>dbl:wan_host</from>
+      <to>fr:wan-host</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>ep:wan-lookup</from>
+      <to>sv:remove-process-fields</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:wan-host</from>
+      <to>found</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:wan-host</from>
+      <to>not-found</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:wan-ip</from>
+      <to>found-wan-ip</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>fr:wan-ip</from>
+      <to>not-found-wan-ip</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>not-found</from>
+      <to>sv:missed-lookups</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sv:missed-lookups</from>
+      <to>ac:commands</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sv:remove-process-fields</from>
+      <to>fr:wan-ip</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>dbl:lookup-host</from>
+      <to>dbl:wan_host</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>gfn:past-web-files</from>
+      <to>Sort rows</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Sort rows</from>
+      <to>js:check-current</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>js:check-current</from>
+      <to>tfi:prior-web_files</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>tfi:prior-web_files</from>
+      <to>sr:sort-sites-prior</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>tfi:web_files</from>
+      <to>sr:sort-sites</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sr:sort-sites</from>
+      <to>mr:sites</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sr:sort-sites-prior</from>
+      <to>mr:sites</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>mr:sites</from>
+      <to>post-merge</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>post-merge</from>
+      <to>Switch / case</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Switch / case</from>
+      <to>discard</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Switch / case</from>
+      <to>new-changed</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>new-changed</from>
+      <to>js get-date</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>found</from>
+      <to>sv:found-output</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>dlu:wan-host</from>
+      <to>sv:output-wan</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>found-wan-ip</from>
+      <to>js:get-tld</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>js:get-tld</from>
+      <to>dlu:wan-host</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sv:found-output</from>
+      <to>to:webmon</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sv:output-wan</from>
+      <to>to:webmon</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>not-found-wan-ip</from>
+      <to>js:get-tld 2</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>js:get-tld 2</from>
+      <to>dlu:wan-host-new</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>dlu:wan-host-new</from>
+      <to>sv:output-wan-new</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>sv:output-wan-new</from>
+      <to>to:webmon</to>
+      <enabled>Y</enabled>
+    </hop>
   </order>
+  <step>
+    <name>Sort rows</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>short_filename</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>48</xloc>
+      <yloc>112</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Switch / case</name>
+    <type>SwitchCase</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fieldname>flagfield</fieldname>
+    <use_contains>N</use_contains>
+    <case_value_type>String</case_value_type>
+    <case_value_format/>
+    <case_value_decimal/>
+    <case_value_group/>
+    <default_target_step>discard</default_target_step>
+    <cases>
+      <case>
+        <value>new</value>
+        <target_step>new-changed</target_step>
+      </case>
+      <case>
+        <value>changed</value>
+        <target_step>new-changed</target_step>
+      </case>
+    </cases>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>432</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ac:commands</name>
+    <type>Constant</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>command</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>/home/agrohe21/projects/gargoyle/scripts/get_revnslookup.sh</nullif>
+        <length>50</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>win_command</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>c:\cygwin64\bin\bash.exe -l /home/andgrohe/agrohe/projects/gargoyle/scripts/get_revnslookup.sh</nullif>
+        <length>50</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+      <field>
+        <name>test_command</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal/>
+        <group/>
+        <nullif>c:\cygwin64\bin\bash.exe -l pwd</nullif>
+        <length>50</length>
+        <precision>-1</precision>
+        <set_empty_string>N</set_empty_string>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1248</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
   <step>
     <name>dbl:lookup-date</name>
     <type>DBLookup</type>
@@ -539,7 +841,7 @@
       <table>dim_date</table>
       <orderby/>
       <fail_on_multiple>N</fail_on_multiple>
-      <eat_row_on_failure>N</eat_row_on_failure>
+      <eat_row_on_failure>Y</eat_row_on_failure>
       <key>
         <name>trans_date</name>
         <field>DATE</field>
@@ -562,8 +864,8 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>270</xloc>
-      <yloc>180</yloc>
+      <xloc>720</xloc>
+      <yloc>304</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -610,8 +912,257 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>390</xloc>
-      <yloc>180</yloc>
+      <xloc>832</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>dbl:wan_host</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>4</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>gargoyle_bwmon</connection>
+    <cache>N</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_wan_host</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key>
+        <name>domain</name>
+        <field>fqdn</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>wan_host_id</name>
+        <rename>wan_host_id</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>928</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>discard</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>432</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>dlu:wan-host</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <schema/>
+    <table>dim_wan_host</table>
+    <connection>gargoyle_bwmon</connection>
+    <commit>1000</commit>
+    <update>Y</update>
+    <fields>
+      <key>
+        <name>wan_ip</name>
+        <lookup>wan_ip</lookup>
+      </key>
+      <date>
+        <name/>
+        <from>date_from</from>
+        <to>date_to</to>
+      </date>
+      <field>
+        <name>domain</name>
+        <lookup>wan_domain</lookup>
+        <update>Update</update>
+      </field>
+      <field>
+        <name>fqdn</name>
+        <lookup>fqdn</lookup>
+        <update>Update</update>
+      </field>
+      <field>
+        <name/>
+        <lookup>date_modified</lookup>
+        <update>DateInsertedOrUpdated</update>
+      </field>
+      <return>
+        <name>wan_host_id</name>
+        <rename/>
+        <creation_method>tablemax</creation_method>
+        <use_autoinc>N</use_autoinc>
+        <version>version</version>
+      </return>
+    </fields>
+    <sequence/>
+    <min_year>1900</min_year>
+    <max_year>2199</max_year>
+    <cache_size>9999</cache_size>
+    <preload_cache>N</preload_cache>
+    <use_start_date_alternative>N</use_start_date_alternative>
+    <start_date_alternative>none</start_date_alternative>
+    <start_date_field_name/>
+    <useBatch>N</useBatch>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1456</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>dlu:wan-host-new</name>
+    <type>DimensionLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <schema/>
+    <table>dim_wan_host</table>
+    <connection>gargoyle_bwmon</connection>
+    <commit>1000</commit>
+    <update>Y</update>
+    <fields>
+      <key>
+        <name>fqdn</name>
+        <lookup>fqdn</lookup>
+      </key>
+      <date>
+        <name/>
+        <from>date_from</from>
+        <to>date_to</to>
+      </date>
+      <field>
+        <name>domain</name>
+        <lookup>wan_domain</lookup>
+        <update>Update</update>
+      </field>
+      <field>
+        <name/>
+        <lookup>date_modified</lookup>
+        <update>DateInsertedOrUpdated</update>
+      </field>
+      <return>
+        <name>wan_host_id</name>
+        <rename/>
+        <creation_method>tablemax</creation_method>
+        <use_autoinc>N</use_autoinc>
+        <version>version</version>
+      </return>
+    </fields>
+    <sequence/>
+    <min_year>1900</min_year>
+    <max_year>2199</max_year>
+    <cache_size>9999</cache_size>
+    <preload_cache>N</preload_cache>
+    <use_start_date_alternative>N</use_start_date_alternative>
+    <start_date_alternative>none</start_date_alternative>
+    <start_date_field_name/>
+    <useBatch>N</useBatch>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1712</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>ep:wan-lookup</name>
+    <type>ExecProcess</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>8</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <processfield>win_command</processfield>
+    <resultfieldname>stdOut</resultfieldname>
+    <errorfieldname>stdErr</errorfieldname>
+    <exitvaluefieldname>proc_exit</exitvaluefieldname>
+    <failwhennotsuccess>N</failwhennotsuccess>
+    <outputlinedelimiter>\n</outputlinedelimiter>
+    <argumentsInFields>Y</argumentsInFields>
+    <argumentFields>
+      <argumentField>
+        <argumentFieldName>domain</argumentFieldName>
+      </argumentField>
+    </argumentFields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1360</xloc>
+      <yloc>416</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -635,8 +1186,194 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>510</xloc>
-      <yloc>300</yloc>
+      <xloc>1280</xloc>
+      <yloc>112</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>found</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1120</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>found-wan-ip</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1632</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>fr:wan-host</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>found</send_true_to>
+    <send_false_to>not-found</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>wan_host_id</leftvalue>
+        <function>IS NOT NULL</function>
+        <rightvalue/>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1024</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>fr:wan-ip</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>found-wan-ip</send_true_to>
+    <send_false_to>not-found-wan-ip</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <conditions>
+          <condition>
+            <negated>N</negated>
+            <leftvalue>wan_ip</leftvalue>
+            <function>IS NOT NULL</function>
+            <rightvalue/>
+          </condition>
+          <condition>
+            <negated>N</negated>
+            <operator>AND</operator>
+            <leftvalue>proc_exit</leftvalue>
+            <function>=</function>
+            <rightvalue/>
+            <value>
+              <name>constant</name>
+              <type>Integer</type>
+              <text>0</text>
+              <length>-1</length>
+              <precision>0</precision>
+              <isnull>N</isnull>
+              <mask>####0;-####0</mask>
+            </value>
+          </condition>
+        </conditions>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1632</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>gfn:past-web-files</name>
+    <type>GetFileNames</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <filter>
+      <filterfiletype>all_files</filterfiletype>
+    </filter>
+    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <rownum>Y</rownum>
+    <isaddresult>N</isaddresult>
+    <filefield>N</filefield>
+    <rownum_field>row_nbr</rownum_field>
+    <filename_Field/>
+    <wildcard_Field/>
+    <exclude_wildcard_Field/>
+    <dynamic_include_subfolders>N</dynamic_include_subfolders>
+    <limit>0</limit>
+    <file>
+      <name>${PROJECT_INPUT}/complete</name>
+      <filemask>mon_web-.*.zip</filemask>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>48</xloc>
+      <yloc>48</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -661,7 +1398,9 @@
 
 
 trans_date =  new Date(0);
-trans_date.setUTCSeconds(date_epoch);</jsScript_script>
+trans_date.setUTCSeconds(date_epoch);
+
+trans_date = truncDate(trans_date,1);</jsScript_script>
       </jsScript>
       <jsScript>
         <jsScript_type>1</jsScript_type>
@@ -690,8 +1429,777 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>150</xloc>
-      <yloc>180</yloc>
+      <xloc>624</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>js:check-current</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>
+curr_date = getVariable("file_date", "2020-01-01-00-00-00");
+
+trans_Status = SKIP_TRANSFORMATION;
+if (short_filename == "mon_web-"+ curr_date + ".zip") {
+	trans_Status = CONTINUE_TRANSFORMATION;
+} else{
+	file_parts = short_filename.split("-");
+	file_parts.shift();
+	file_parts[5] = replace(file_parts[5], ".zip", "");
+	file_parts = file_parts.join("-");
+	prior_file = "zip:file://"+ filename + "!web-sites-" + file_parts;
+	prior_date = curr_date;
+}</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Item_0</jsScript_name>
+        <jsScript_script>var prior_file="", curr_date, prior_date, file_parts=[];
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>-1</jsScript_type>
+        <jsScript_name>replace_Sample</jsScript_name>
+        <jsScript_script>// Replaces Strings inside the given Variable.
+// It is possible to make more replacements inside
+// one call. The given variables must be an odd number
+//
+// Usage:
+// replace(var, var, var);
+// 1: String - The Variable with the content to replace.
+// 2: String - The Value to search for.
+// 3: String - The Value to replace with.
+//
+// replace(var, var, var, var,var,...)
+// 1: String - The Variable with the content to replace.
+// 2: String - The First Value to search for.
+// 3: String - The First Value to replace with.
+// 4: String - The Second Value to search for.
+// 5: String - The Second Value to replace with.
+// ...
+//
+// 2006-11-15
+//
+var str1 = "Hello World, this is a nice function";      
+var str2 = replace(str1,"World", "Folk");
+Alert(str2);
+var str2 = replace(str1,"World", "Folk", "nice","beautifull");
+Alert(str2);</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>prior_file</name>
+        <rename>prior_filename</rename>
+        <type>String</type>
+        <length>128</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>48</xloc>
+      <yloc>176</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>js:get-tld</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>try {
+	domain = fqdn.split(".");
+	domain = domain[domain.length-2]+"."+domain[domain.length-1]
+}catch(e) {
+	domain = 'unknown';
+}</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Item_0</jsScript_name>
+        <jsScript_script>//Script here
+
+var domain;</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>domain</name>
+        <rename>domain</rename>
+        <type>String</type>
+        <length>128</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1552</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>js:get-tld 2</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>try {
+	domain = fqdn.split(".");
+	domain = domain[domain.length-2]+"."+domain[domain.length-1]
+}catch(e) {
+	domain = 'unknown';
+}</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Item_0</jsScript_name>
+        <jsScript_script>//Script here
+
+var domain;</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>
+      <field>
+        <name>domain</name>
+        <rename>domain</rename>
+        <type>String</type>
+        <length>128</length>
+        <precision>-1</precision>
+        <replace>N</replace>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1712</xloc>
+      <yloc>336</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>mr:sites</name>
+    <type>MergeRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <keys>
+      <key>host_ip</key>
+      <key>domain</key>
+    </keys>
+    <values>
+      <value>date_epoch</value>
+    </values>
+    <flag_field>flagfield</flag_field>
+    <reference>sr:sort-sites-prior</reference>
+    <compare>sr:sort-sites</compare>
+    <compare>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>256</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>new-changed</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>528</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>not-found</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1024</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>not-found-wan-ip</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1712</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>post-merge</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>336</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sr:sort-sites</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>host_ip</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>domain</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>160</xloc>
+      <yloc>352</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sr:sort-sites-prior</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields>
+      <field>
+        <name>host_ip</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+      <field>
+        <name>domain</name>
+        <ascending>Y</ascending>
+        <case_sensitive>N</case_sensitive>
+        <collator_enabled>N</collator_enabled>
+        <collator_strength>0</collator_strength>
+        <presorted>N</presorted>
+      </field>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>160</xloc>
+      <yloc>256</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sv:found-output</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>date_key</name>
+      </field>
+      <field>
+        <name>host_id</name>
+      </field>
+      <field>
+        <name>wan_host_id</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sv:missed-lookups</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <select_unspecified>N</select_unspecified>
+      <remove>
+        <name>wan_host_id</name>
+      </remove>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1136</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sv:output-wan</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>date_key</name>
+      </field>
+      <field>
+        <name>host_id</name>
+      </field>
+      <field>
+        <name>wan_host_id</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1360</xloc>
+      <yloc>304</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sv:output-wan-new</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>date_key</name>
+      </field>
+      <field>
+        <name>host_id</name>
+      </field>
+      <field>
+        <name>wan_host_id</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1552</xloc>
+      <yloc>208</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>sv:remove-process-fields</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields>
+      <field>
+        <name>date_epoch</name>
+      </field>
+      <field>
+        <name>host_id</name>
+      </field>
+      <field>
+        <name>domain</name>
+        <rename>fqdn</rename>
+      </field>
+      <field>
+        <name>date_key</name>
+      </field>
+      <field>
+        <name>stdOut</name>
+        <rename>wan_ip</rename>
+      </field>
+      <field>
+        <name>stdErr</name>
+      </field>
+      <field>
+        <name>proc_exit</name>
+      </field>
+      <select_unspecified>N</select_unspecified>
+    </fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1488</xloc>
+      <yloc>416</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>tfi:prior-web_files</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>Y</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field>prior_filename</accept_field>
+    <accept_stepname>js:check-current</accept_stepname>
+    <separator> </separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>N</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field>file_name</include_field>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>Unix</format>
+    <encoding/>
+    <length>Characters</length>
+    <add_to_result_filenames>Y</add_to_result_filenames>
+    <file>
+      <name>zip://${PROJECT_INPUT}/complete/mon_web-${file_date}.zip</name>
+      <filemask>web-sites-${file_date}</filemask>
+      <exclude_filemask/>
+      <file_required>N</file_required>
+      <include_subfolders>Y</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields>
+      <field>
+        <name>date_epoch</name>
+        <type>Integer</type>
+        <format/>
+        <currency/>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif>-</nullif>
+        <ifnull/>
+        <position>-1</position>
+        <length>-1</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>host_ip</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif>-</nullif>
+        <ifnull/>
+        <position>-1</position>
+        <length>15</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+      <field>
+        <name>domain</name>
+        <type>String</type>
+        <format/>
+        <currency/>
+        <decimal>.</decimal>
+        <group>,</group>
+        <nullif>-</nullif>
+        <ifnull/>
+        <position>-1</position>
+        <length>256</length>
+        <precision>-1</precision>
+        <trim_type>none</trim_type>
+        <repeat>N</repeat>
+      </field>
+    </fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>Y</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>48</xloc>
+      <yloc>256</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -825,8 +2333,8 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>30</xloc>
-      <yloc>180</yloc>
+      <xloc>48</xloc>
+      <yloc>352</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -848,7 +2356,7 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
     <use_batch>N</use_batch>
-    <specify_fields>Y</specify_fields>
+    <specify_fields>N</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
     <partitioning_field/>
     <partitioning_daily>N</partitioning_daily>
@@ -859,18 +2367,6 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
     <return_keys>N</return_keys>
     <return_field/>
     <fields>
-      <field>
-        <column_name>date_key</column_name>
-        <stream_name>date_key</stream_name>
-      </field>
-      <field>
-        <column_name>host_id</column_name>
-        <stream_name>host_id</stream_name>
-      </field>
-      <field>
-        <column_name>domain</column_name>
-        <stream_name>domain</stream_name>
-      </field>
     </fields>
     <attributes/>
     <cluster_schema/>
@@ -881,8 +2377,8 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>510</xloc>
-      <yloc>180</yloc>
+      <xloc>1280</xloc>
+      <yloc>208</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
@@ -891,10 +2387,10 @@ var ip_addr = '', tmp, trans_date, domain;</jsScript_script>
       <source_step>to:webmon</source_step>
       <target_step>existing records</target_step>
       <is_enabled>Y</is_enabled>
-      <nr_valuename/>
-      <descriptions_valuename/>
-      <fields_valuename/>
-      <codes_valuename/>
+      <nr_valuename>err_nbr</nr_valuename>
+      <descriptions_valuename>err_desc</descriptions_valuename>
+      <fields_valuename>err_fld</fields_valuename>
+      <codes_valuename>err_cd</codes_valuename>
       <max_errors/>
       <max_pct_errors/>
       <min_pct_rows/>
