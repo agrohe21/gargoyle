@@ -105,7 +105,7 @@ inner join dim_date t4 on t4.date_key = t1.session_end_date_key
 left outer join f_connection t5 on t5.date_key between t1.session_start_date_key and t1.sessioN_end_date_key
 left outer join dim_wan_host t6 on t6.wan_host_id = t5.wan_host_id
 where host_owner ='eva'
-  and host_name = 'eva-iPhone-11'
+  -- and host_name = 'eva-iPhone-11'
   and date_trunc('day', t2."DATE") = CURRENT_DATE
 group by t2.hour_day, t3.host_name, t2."DATE", t4."DATE", t6.fqdn
 order by host_name, t2.hour_day

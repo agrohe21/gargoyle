@@ -1,3 +1,3 @@
 #!/bin/sh
 
-nslookup $1 |head -n 1|awk -F'name = ' '{print $2}'|sed 's/.$//'
+nslookup $1 | awk '-Fame = ' '{print $2}'| tail -n 2 |head -n 1
