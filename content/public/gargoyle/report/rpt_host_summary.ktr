@@ -678,7 +678,7 @@ SET [SLICER] as '[F_HOSTS]'
 SET [COL_SET] as '[RPT_MEASURES]'
 SET [ROW_SET] as '{}'
 select
-NON EMPTY {[COL_SET]} on columns,
+{[COL_SET]} on columns,
 [today] on rows
 from [connection]
 where ([SLICER])</sql>

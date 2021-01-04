@@ -1,5 +1,5 @@
 set PROJECT_NAME="gargoyle"
-set KETTLE_CLIENT_DIR="C:\Users\andgrohe\Tools\pentaho\8.3GA\data-integration"
+set KETTLE_CLIENT_DIR="C:\Users\andgrohe\Tools\pentaho\9.1GA\data-integration"
 
 
 set KETTLE_HOME=%CD%
